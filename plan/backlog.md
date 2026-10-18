@@ -1,0 +1,35 @@
+# NiagaFlow — Backlog
+
+Sumber: `plan/niagaflow_fullstack_project_plan.md` (§3 Ruang Lingkup, §9 Jadwal, §10 Prioritas).
+Alur kerja: `workflow.md` — backlog → issues → kit → run loop (per issue: grooms → implement → verify → PASS/FAIL → close).
+
+## P0 — MVP
+
+- [x] ISSUE-001 — Scaffold monorepo (web + api + health check + README) — Minggu 1 ✅ 18 Okt 2026
+- [x] ISSUE-002 — Skema database Prisma + migrasi + seed demo — Minggu 2 ✅ 18 Okt 2026
+- [x] ISSUE-003 — Autentikasi login/logout/me + middleware role — Minggu 2 ✅ 18 Okt 2026
+- [x] ISSUE-004 — CRUD kategori (hapus hanya jika tidak dipakai) — Minggu 3 ✅ 18 Okt 2026
+- [x] ISSUE-005 — CRUD produk (SKU unik, search/filter/pagination, arsip) — Minggu 3 ✅ 18 Okt 2026
+- [x] ISSUE-006 — CRUD pelanggan + riwayat pesanan per pelanggan — Minggu 4 ✅ 18 Okt 2026
+- [x] ISSUE-007 — Buat pesanan (transaksi DB, stok, total dihitung backend) — Minggu 4 ✅ 18 Okt 2026
+- [x] ISSUE-008 — Status pesanan, cancel + pengembalian stok, riwayat status — Minggu 4 ✅ 18 Okt 2026
+- [x] ISSUE-009 — API dashboard & laporan (summary, top-products, low-stock) — Minggu 5 ✅ 18 Okt 2026
+- [ ] ISSUE-010 — Frontend shell + login + proteksi route — Minggu 6
+- [ ] ISSUE-011 — Halaman produk, kategori, pelanggan — Minggu 6
+- [ ] ISSUE-012 — Halaman pesanan, dashboard, laporan — Minggu 6
+
+## P1 — setelah P0 stabil
+
+- [ ] ISSUE-013 — Test integration alur inti (Vitest + Supertest) — Minggu 7
+- [ ] ISSUE-014 — Keamanan (rate limit login, CORS ketat) + OpenAPI + deployment — Minggu 7
+
+## P2 — tunda (jangan disentuh sebelum MVP)
+
+Portal pelanggan, notifikasi email/WA, impor CSV, multi-toko, payment gateway, audit log lengkap, PWA.
+
+## Aturan loop
+
+1. Kerjakan issue berurutan sesuai nomor (P0 dulu).
+2. Satu issue = satu commit (atau beberapa commit kecil) dengan pesan jelas: `ISSUE-00X: deskripsi`.
+3. Sebelum close, cek Definition of Done di `plan/kit.md`.
+4. Jika ada temuan saat implementasi yang mengubah AC, update file issue-nya dulu.
