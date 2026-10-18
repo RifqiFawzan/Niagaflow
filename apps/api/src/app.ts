@@ -7,6 +7,7 @@ import { categoriesRouter } from "./modules/categories/categories.routes";
 import { productsRouter } from "./modules/products/products.routes";
 import { customersRouter } from "./modules/customers/customers.routes";
 import { ordersRouter } from "./modules/orders/orders.routes";
+import { reportsRouter } from "./modules/reports/reports.routes";
 import { ApiError } from "./utils/ApiError";
 
 const app = express();
@@ -26,6 +27,7 @@ app.use("/api/v1/categories", categoriesRouter);
 app.use("/api/v1/products", productsRouter);
 app.use("/api/v1/customers", customersRouter);
 app.use("/api/v1/orders", ordersRouter);
+app.use("/api/v1/reports", reportsRouter);
 
 // 404
 app.use((_req, res) => {
