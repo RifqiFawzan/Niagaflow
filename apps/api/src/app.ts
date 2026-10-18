@@ -6,6 +6,8 @@ import { authRouter } from "./modules/auth/auth.routes";
 import { categoriesRouter } from "./modules/categories/categories.routes";
 import { productsRouter } from "./modules/products/products.routes";
 import { customersRouter } from "./modules/customers/customers.routes";
+import { ordersRouter } from "./modules/orders/orders.routes";
+import { ApiError } from "./utils/ApiError";
 
 const app = express();
 
@@ -23,6 +25,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/categories", categoriesRouter);
 app.use("/api/v1/products", productsRouter);
 app.use("/api/v1/customers", customersRouter);
+app.use("/api/v1/orders", ordersRouter);
 
 // 404
 app.use((_req, res) => {
@@ -35,6 +38,12 @@ app.use((_req, res) => {
 // Error handler
 app.use(
   (err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    if (err instanceof ApiError) {
+      return res.status(err.status).json({
+        success: false,
+        error: { code: err.code, message: err.message },
+      });
+    }
     console.error(err);
     res.status(500).json({
       success: false,
