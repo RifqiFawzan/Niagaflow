@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { healthRouter } from "./modules/health/health.routes";
 import { authRouter } from "./modules/auth/auth.routes";
 import { categoriesRouter } from "./modules/categories/categories.routes";
+import { productsRouter } from "./modules/products/products.routes";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/categories", categoriesRouter);
+app.use("/api/v1/products", productsRouter);
 
 // 404
 app.use((_req, res) => {
