@@ -14,7 +14,7 @@ Alur kerja: `workflow.md` — backlog → issues → kit → run loop (per issue
 - [x] ISSUE-007 — Buat pesanan (transaksi DB, stok, total dihitung backend) — Minggu 4 ✅ 18 Okt 2026
 - [x] ISSUE-008 — Status pesanan, cancel + pengembalian stok, riwayat status — Minggu 4 ✅ 18 Okt 2026
 - [x] ISSUE-009 — API dashboard & laporan (summary, top-products, low-stock) — Minggu 5 ✅ 18 Okt 2026
-- [ ] ISSUE-010 — Frontend shell + login + proteksi route — Minggu 6
+- [x] ISSUE-010 — Frontend shell + login + proteksi route — Minggu 6 ✅ 18 Okt 2026
 - [ ] ISSUE-011 — Halaman produk, kategori, pelanggan — Minggu 6
 - [ ] ISSUE-012 — Halaman pesanan, dashboard, laporan — Minggu 6
 
