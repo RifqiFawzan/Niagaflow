@@ -10,5 +10,9 @@
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "seed": "npm run seed -w apps/api"
+  },
+  "optionalDependencies": {
+    "@esbuild/linux-x64": "^0.28.2",
+    "@rollup/rollup-linux-x64-gnu": "^4.64.9"
   }
 }
