@@ -18,7 +18,9 @@ const rangeSchema = z.object({
 
 function resolveRange(from?: Date, to?: Date) {
   const end = to ? new Date(new Date(to).setHours(23, 59, 59, 999)) : new Date();
-  const start = from ?? new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
+  // `from` juga diselaraskan ke awal hari lokal (bukan UTC midnight dari "YYYY-MM-DD"),
+  // supaya pesanan dini hari pada tanggal awal tidak ikut terbuang.
+  const start = from ? new Date(new Date(from).setHours(0, 0, 0, 0)) : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
   return { start, end };
 }
 

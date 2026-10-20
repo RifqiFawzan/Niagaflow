@@ -51,6 +51,23 @@ Proyek ini dikerjakan mengikuti alur di `workflow.md`: `plan/` (rencana) → `pl
 
 Lihat `plan/kit.md` sebelum menambah kode — konvensi API, aturan bisnis (stok, uang Decimal, transaksi), dan Definition of Done ada di sana.
 
+## Test
+
+Test integration (Vitest + Supertest) ada di `apps/api/tests` dan memakai **database test terpisah** (`niagaflow_test`), bukan data demo.
+
+```bash
+# sekali saja: buat database test
+docker exec niagaflow-pg psql -U postgres -c "CREATE DATABASE niagaflow_test;"
+# siapkan kredensial test
+cp apps/api/.env.test.example apps/api/.env.test   # lalu sesuaikan DATABASE_URL
+
+npm run test                   # jalankan seluruh suite (dari root)
+npm run test -w apps/api       # hanya test API
+npm run typecheck -w apps/api  # typecheck src + tests
+```
+
+Skema database test di-reset otomatis sebelum suite berjalan (`prisma db push --force-reset`), dan setiap test membangun ulang fixture-nya sendiri sehingga urutan eksekusi tidak berpengaruh.
+
 ## API
 
 Base URL: `http://localhost:4000/api/v1`. Endpoint inti (rincian di `plan/niagaflow_fullstack_project_plan.md` §7): auth, products, categories, customers, orders, reports.

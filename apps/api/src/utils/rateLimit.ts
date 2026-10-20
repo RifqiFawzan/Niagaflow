@@ -30,3 +30,11 @@ setInterval(() => {
     if (now > bucket.resetAt) buckets.delete(key);
   }
 }, 60_000).unref();
+
+/**
+ * Mengosongkan semua bucket rate limit. Dipakai oleh test integration supaya
+ * pembatasan login (10/menit) tidak bocor antar-test / antar-suite.
+ */
+export function resetRateLimit(): void {
+  buckets.clear();
+}
