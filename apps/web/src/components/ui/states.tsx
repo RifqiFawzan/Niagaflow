@@ -1,10 +1,58 @@
 import type { ReactNode } from "react";
+import { AlertTriangle, Inbox, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+
+/** Latar berdenyut untuk tabel/form yang sedang dimuat. */
+export function SkeletonBlock({ className }: { className?: string }) {
+  return <Skeleton className={cn("h-4 w-full", className)} />;
+}
+
+function Shell({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <Card className={cn("py-0", className)}>
+      <CardContent className="flex flex-col items-center justify-center gap-3 px-6 py-14 text-center">
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
 
 export function LoadingState({ label = "Memuat..." }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-slate-500">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
-      <p className="text-sm">{label}</p>
+    <div className="flex flex-col gap-4" role="status" aria-live="polite">
+      <span className="sr-only">{label}</span>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Skeleton className="h-20 rounded-xl" />
+        <Skeleton className="h-20 rounded-xl" />
+        <Skeleton className="h-20 rounded-xl" />
+      </div>
+      <div className="space-y-3 rounded-xl border p-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <SkeletonBlock key={i} className="h-6" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Blok loading ringkas untuk area kecil (mis. riwayat pesanan). */
+export function InlineLoading({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="space-y-3" role="status" aria-live="polite">
+      <span className="sr-only">Memuat...</span>
+      {Array.from({ length: rows }).map((_, i) => (
+        <SkeletonBlock key={i} className="h-6" />
+      ))}
     </div>
   );
 }
@@ -19,11 +67,20 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
-      <p className="font-medium text-slate-600">{title}</p>
-      {description && <p className="max-w-md text-sm text-slate-400">{description}</p>}
-      {action && <div className="mt-2">{action}</div>}
-    </div>
+    <Shell className="border-dashed">
+      <div className="bg-muted text-muted-foreground rounded-full p-3">
+        <Inbox className="size-5" />
+      </div>
+      <div>
+        <p className="font-medium">{title}</p>
+        {description && (
+          <p className="text-muted-foreground mt-1 max-w-md text-sm">
+            {description}
+          </p>
+        )}
+      </div>
+      {action && <div className="mt-1">{action}</div>}
+    </Shell>
   );
 }
 
@@ -35,17 +92,17 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-6 py-12 text-center">
-      <p className="text-sm font-medium text-rose-700">{message}</p>
+    <Shell className="border-destructive/30">
+      <div className="bg-destructive/10 text-destructive rounded-full p-3">
+        <AlertTriangle className="size-5" />
+      </div>
+      <p className="text-destructive text-sm font-medium">{message}</p>
       {onRetry && (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="rounded-lg border border-rose-300 px-4 py-1.5 text-sm text-rose-700 hover:bg-rose-100"
-        >
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          <RefreshCw />
           Coba lagi
-        </button>
+        </Button>
       )}
-    </div>
+    </Shell>
   );
 }

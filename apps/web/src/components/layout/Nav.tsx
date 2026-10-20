@@ -1,43 +1,60 @@
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../../features/auth/AuthContext";
 import type { ReactNode } from "react";
+import { NavLink } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Package,
+  ReceiptText,
+  Tags,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+import { useAuth } from "@/features/auth/AuthContext";
+import { cn } from "@/lib/utils";
 
 type NavItem = {
   to: string;
   label: string;
+  icon: LucideIcon;
   ownerOnly?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/products", label: "Produk" },
-  { to: "/categories", label: "Kategori", ownerOnly: true },
-  { to: "/customers", label: "Pelanggan", ownerOnly: true },
-  { to: "/orders", label: "Pesanan" },
-  { to: "/reports", label: "Laporan", ownerOnly: true },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/products", label: "Produk", icon: Package },
+  { to: "/categories", label: "Kategori", icon: Tags, ownerOnly: true },
+  { to: "/customers", label: "Pelanggan", icon: Users, ownerOnly: true },
+  { to: "/orders", label: "Pesanan", icon: ReceiptText },
+  { to: "/reports", label: "Laporan", icon: TrendingUp, ownerOnly: true },
 ];
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
-
-  const items = NAV_ITEMS.filter((item) => !item.ownerOnly || user?.role === "owner");
+  const items = NAV_ITEMS.filter(
+    (item) => !item.ownerOnly || user?.role === "owner"
+  );
 
   return (
-    <nav className="flex h-full flex-col gap-1 p-4">
-      <div className="mb-4 px-2 text-xl font-bold text-blue-700">NiagaFlow</div>
+    <nav className="flex h-full flex-col gap-1 p-3">
+      <div className="mb-3 px-2 py-1 text-lg font-bold tracking-tight">
+        NiagaFlow
+      </div>
       {items.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           onClick={onNavigate}
           className={({ isActive }) =>
-            `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            cn(
+              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive
-                ? "bg-blue-50 text-blue-700"
-                : "text-slate-600 hover:bg-slate-100"
-            }`
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            )
           }
         >
+          <item.icon className="size-4 shrink-0" />
           {item.label}
         </NavLink>
       ))}
@@ -45,16 +62,11 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+/** Kompatibilitas: AppLayout baru memakai header sendiri. */
 export function Topbar({ children }: { children?: ReactNode }) {
   return (
-    <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4">
-      <div className="lg:hidden">
-        {/* slot tombol menu mobile dikirim AppLayout */}
-        {children}
-      </div>
-      <div className="hidden text-sm font-medium text-slate-500 lg:block">
-        Sistem manajemen pesanan &amp; stok
-      </div>
+    <header className="bg-background flex h-14 items-center border-b px-4">
+      {children}
     </header>
   );
 }

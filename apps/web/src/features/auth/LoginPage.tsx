@@ -1,6 +1,18 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Loader2, LockKeyhole } from "lucide-react";
 import { useAuth, ApiRequestError } from "./AuthContext";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function LoginPage() {
   const { user, isLoading, login } = useAuth();
@@ -12,7 +24,8 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   if (!isLoading && user) {
-    const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+    const from = (location.state as { from?: { pathname: string } } | null)?.from
+      ?.pathname;
     return <Navigate to={from ?? "/dashboard"} replace />;
   }
 
@@ -22,7 +35,8 @@ export function LoginPage() {
     setBusy(true);
     try {
       await login(email, password);
-      const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+      const from = (location.state as { from?: { pathname: string } } | null)
+        ?.from?.pathname;
       navigate(from ?? "/dashboard", { replace: true });
     } catch (err) {
       setError(
@@ -33,59 +47,92 @@ export function LoginPage() {
     }
   };
 
+  const prefill = (role: "owner" | "staff") => {
+    setEmail(`${role}@niagaflow.test`);
+    setPassword("password123");
+    setError(null);
+  };
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-xl bg-white p-8 shadow"
-      >
-        <h1 className="text-2xl font-bold text-slate-800">NiagaFlow</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Masuk untuk mengelola pesanan dan stok usahamu.
-        </p>
+    <main className="bg-muted/40 flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <div className="bg-primary text-primary-foreground mb-2 flex size-10 items-center justify-center rounded-lg">
+            <LockKeyhole className="size-5" />
+          </div>
+          <CardTitle className="text-xl">Masuk ke NiagaFlow</CardTitle>
+          <CardDescription>
+            Kelola pesanan, stok, dan laporan usahamu.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nama@contoh.com"
+              />
+            </div>
 
-        <label className="mt-6 block text-sm font-medium text-slate-700">
-          Email
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            placeholder="nama@contoh.com"
-          />
-        </label>
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
 
-        <label className="mt-4 block text-sm font-medium text-slate-700">
-          Password
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            placeholder="••••••••"
-          />
-        </label>
+            {error && (
+              <p
+                role="alert"
+                className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm"
+              >
+                {error}
+              </p>
+            )}
 
-        {error && (
-          <p className="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">
-            {error}
-          </p>
-        )}
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy && <Loader2 className="animate-spin" />}
+              {busy ? "Memproses..." : "Masuk"}
+            </Button>
+          </form>
 
-        <button
-          type="submit"
-          disabled={busy}
-          className="mt-6 w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {busy ? "Memproses..." : "Masuk"}
-        </button>
-
-        <p className="mt-4 text-center text-xs text-slate-400">
-          Demo: owner@niagaflow.test / password123
-        </p>
-      </form>
+          <div className="mt-6 space-y-2">
+            <p className="text-muted-foreground text-center text-xs">
+              Akun demo — klik untuk mengisi otomatis
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => prefill("owner")}
+              >
+                Pemilik
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => prefill("staff")}
+              >
+                Staf
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }

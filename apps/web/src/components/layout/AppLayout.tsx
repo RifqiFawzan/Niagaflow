@@ -1,7 +1,10 @@
+import { useNavigate, Outlet } from "react-router-dom";
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { Sidebar, Topbar } from "./Nav";
-import { useAuth } from "../../features/auth/AuthContext";
+import { LogOut, Menu } from "lucide-react";
+
+import { Sidebar } from "./Nav";
+import { useAuth } from "@/features/auth/AuthContext";
+import { Button } from "@/components/ui/button";
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -14,52 +17,51 @@ export function AppLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      {/* Sidebar desktop */}
-      <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white lg:block">
+    <div className="bg-muted/40 flex min-h-screen">
+      <aside className="bg-background hidden w-60 shrink-0 border-r lg:block">
         <Sidebar />
       </aside>
 
-      {/* Sidebar mobile */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-30 lg:hidden">
+        <div className="fixed inset-0 z-40 lg:hidden">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="absolute inset-y-0 left-0 w-60 bg-white shadow-xl">
+          <aside className="bg-background absolute inset-y-0 left-0 w-60 shadow-xl">
             <Sidebar onNavigate={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+        <header className="bg-background flex h-14 items-center gap-3 border-b px-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
             aria-label="Buka menu"
+            onClick={() => setMobileOpen(true)}
           >
-            ☰
-          </button>
-        </Topbar>
+            <Menu />
+          </Button>
+          <span className="text-muted-foreground text-sm font-medium">
+            Sistem manajemen pesanan &amp; stok
+          </span>
 
-        <div className="flex items-center justify-end gap-3 border-b border-slate-200 bg-white px-4 py-2">
-          <div className="text-right">
-            <p className="text-sm font-medium text-slate-700">{user?.name}</p>
-            <p className="text-xs text-slate-400">
-              {user?.role === "owner" ? "Pemilik" : "Staf"}
-            </p>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-sm leading-none font-medium">{user?.name}</p>
+              <p className="text-muted-foreground text-xs">
+                {user?.role === "owner" ? "Pemilik" : "Staf"}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              <LogOut />
+              Keluar
+            </Button>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
-          >
-            Keluar
-          </button>
-        </div>
+        </header>
 
         <main className="flex-1 p-4 lg:p-6">
           <Outlet />

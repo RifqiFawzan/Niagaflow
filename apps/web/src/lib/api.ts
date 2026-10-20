@@ -15,6 +15,16 @@ export class ApiRequestError extends Error {
   }
 }
 
+/** Ubah error apa pun jadi pesan yang layak ditampilkan ke pengguna. */
+export function errorMessage(err: unknown, fallback = "Terjadi kesalahan."): string {
+  return err instanceof ApiRequestError ? err.message : fallback;
+}
+
+/** Cek kode error API (mis. SKU_DUPLICATE) tanpa kehilangan type-safety. */
+export function isApiErrorCode(err: unknown, code: string): boolean {
+  return err instanceof ApiRequestError && err.code === code;
+}
+
 /** Fetch wrapper: base /api/v1, selalu kirim cookie, error -> ApiRequestError. */
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api/v1${path}`, {

@@ -4,6 +4,11 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { ProtectedRoute, RoleGuard } from "./routes/guards";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { ProductListPage } from "./features/products/ProductListPage";
+import { ProductFormPage } from "./features/products/ProductFormPage";
+import { CategoriesPage } from "./features/categories/CategoriesPage";
+import { CustomerListPage } from "./features/customers/CustomerListPage";
+import { CustomerDetailPage } from "./features/customers/CustomerDetailPage";
 
 export default function App() {
   return (
@@ -18,23 +23,37 @@ export default function App() {
         }
       >
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/products" element={<PlaceholderPage title="Produk" issue="ISSUE-011" />} />
+
+        <Route path="/products" element={<ProductListPage />} />
+        <Route
+          path="/products/new"
+          element={
+            <RoleGuard role="owner">
+              <ProductFormPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/products/:id/edit"
+          element={
+            <RoleGuard role="owner">
+              <ProductFormPage />
+            </RoleGuard>
+          }
+        />
+
         <Route
           path="/categories"
           element={
             <RoleGuard role="owner">
-              <PlaceholderPage title="Kategori" issue="ISSUE-011" />
+              <CategoriesPage />
             </RoleGuard>
           }
         />
-        <Route
-          path="/customers"
-          element={
-            <RoleGuard role="owner">
-              <PlaceholderPage title="Pelanggan" issue="ISSUE-011" />
-            </RoleGuard>
-          }
-        />
+
+        <Route path="/customers" element={<CustomerListPage />} />
+        <Route path="/customers/:id" element={<CustomerDetailPage />} />
+
         <Route path="/orders" element={<PlaceholderPage title="Pesanan" issue="ISSUE-012" />} />
         <Route
           path="/reports"
