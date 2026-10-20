@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { Pencil, Plus, Search } from "lucide-react";
 
 import { api, errorMessage } from "@/lib/api";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
+import { CustomerFormDialog } from "@/features/customers/CustomerFormDialog";
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ export function CustomerListPage() {
   const isOwner = user?.role === "owner";
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Customer | null>(null);
 
   const debouncedSearch = useDebouncedValue(search, 300);
   const params = new URLSearchParams();
@@ -51,7 +54,19 @@ export function CustomerListPage() {
       <PageHeader
         title="Pelanggan"
         description="Data pelanggan dan riwayat pesanannya."
-      />
+      >
+        {isOwner && (
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            <Plus />
+            Pelanggan baru
+          </Button>
+        )}
+      </PageHeader>
 
       <Card className="max-w-md py-4">
         <CardContent className="px-4">
@@ -91,7 +106,23 @@ export function CustomerListPage() {
           description={
             debouncedSearch
               ? "Tidak ada pelanggan yang cocok dengan pencarian."
-              : "Pelanggan akan muncul di sini setelah pesanan dibuat."
+              : isOwner
+                ? "Tambahkan pelanggan agar bisa dipilih saat membuat pesanan."
+                : "Pelanggan yang ditambahkan pemilik akan muncul di sini."
+          }
+          action={
+            isOwner && !debouncedSearch ? (
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditing(null);
+                  setFormOpen(true);
+                }}
+              >
+                <Plus />
+                Pelanggan baru
+              </Button>
+            ) : undefined
           }
         />
       ) : (
@@ -120,11 +151,26 @@ export function CustomerListPage() {
                         {customer.notes ?? "-"}
                       </TableCell>
                       <TableCell className="pr-4 text-right">
-                        <Button asChild variant="ghost" size="sm">
-                          <Link to={`/customers/${customer.id}`}>
-                            {isOwner ? "Detail" : "Riwayat"}
-                          </Link>
-                        </Button>
+                        <div className="flex items-center justify-end gap-1">
+                          {isOwner && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Ubah ${customer.name}`}
+                              onClick={() => {
+                                setEditing(customer);
+                                setFormOpen(true);
+                              }}
+                            >
+                              <Pencil />
+                            </Button>
+                          )}
+                          <Button asChild variant="ghost" size="sm">
+                            <Link to={`/customers/${customer.id}`}>
+                              {isOwner ? "Detail" : "Riwayat"}
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -143,6 +189,12 @@ export function CustomerListPage() {
           )}
         </>
       )}
+
+      <CustomerFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        customer={editing}
+      />
     </div>
   );
 }

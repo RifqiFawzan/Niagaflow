@@ -104,7 +104,7 @@ export function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Pesanan terbaru</CardTitle>
-            <CardDescription>10 pesanan terakhir.</CardDescription>
+            <CardDescription>5 pesanan terakhir.</CardDescription>
           </CardHeader>
           <CardContent className="px-0">
             {data.recentOrders.length === 0 ? (
