@@ -87,3 +87,22 @@ export type DashboardData = {
   lowStock: Array<Product & { category?: { name: string } | null }>;
   lowStockCount: number;
 };
+
+export type ReportSummary = {
+  from: string;
+  to: string;
+  totalSalesCompleted: number | string;
+  ordersByStatus: Partial<
+    Record<OrderStatus, { count: number; total: number | string }>
+  >;
+  newCustomers: number;
+};
+
+export type TopProduct = {
+  productId: string;
+  name: string;
+  sku: string | null;
+  quantitySold: number;
+  revenue: number | string;
+  ordersCount: number;
+};

@@ -117,29 +117,39 @@ export function DashboardPage() {
             ) : (
               <ul className="divide-border divide-y">
                 {data.recentOrders.map((order) => (
-                  <li
-                    key={order.id}
-                    className="flex items-center justify-between gap-3 px-6 py-3"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium tabular-nums">
-                        {order.orderNumber}
-                      </p>
-                      <p className="text-muted-foreground truncate text-xs">
-                        {order.customer?.name ?? "Tanpa pelanggan"} ·{" "}
-                        {formatDate(order.createdAt)}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-3">
-                      <span className="text-sm tabular-nums">
-                        {formatRupiah(order.total)}
-                      </span>
-                      <StatusBadge status={order.status} />
-                    </div>
+                  <li key={order.id}>
+                    <Link
+                      to={`/orders/${order.id}`}
+                      className="hover:bg-muted/50 flex items-center justify-between gap-3 px-6 py-3 transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium tabular-nums">
+                          {order.orderNumber}
+                        </p>
+                        <p className="text-muted-foreground truncate text-xs">
+                          {order.customer?.name ?? "Tanpa pelanggan"} ·{" "}
+                          {formatDate(order.createdAt)}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="text-sm tabular-nums">
+                          {formatRupiah(order.total)}
+                        </span>
+                        <StatusBadge status={order.status} />
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
             )}
+            <div className="flex flex-wrap gap-2 px-6 pt-4">
+              <Button asChild variant="outline" size="sm">
+                <Link to="/orders">Semua pesanan</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/orders/new">Pesanan baru</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
