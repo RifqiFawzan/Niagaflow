@@ -32,10 +32,16 @@ export function verifySession(token: string): string | null {
   }
 }
 
+// Frontend dan backend berdiri di domain berbeda, jadi browser menganggapnya
+// lintas situs. Cookie dengan SameSite=Lax tidak akan dikirim saat fetch lintas
+// situs, sehingga semua request setelah login gagal 401. SameSite=None
+// mengizinkannya, dan selalu disertai Secure.
+const isProduction = process.env.NODE_ENV === "production";
+
 export const sessionCookieOptions = {
   httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
+  sameSite: isProduction ? ("none" as const) : ("lax" as const),
+  secure: isProduction,
   maxAge: SESSION_TTL_DAYS * 24 * 60 * 60 * 1000,
 };
 

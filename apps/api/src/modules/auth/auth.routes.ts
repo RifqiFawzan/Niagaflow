@@ -50,7 +50,8 @@ router.post("/login", asyncHandler(async (req, res) => {
 }));
 
 router.post("/logout", (_req, res) => {
-  res.clearCookie(SESSION_COOKIE, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
+  // Opsi harus sama dengan saat cookie dibuat, atau browser tidak menghapusnya.
+  res.clearCookie(SESSION_COOKIE, sessionCookieOptions);
   res.json({ success: true, data: null });
 });
 
