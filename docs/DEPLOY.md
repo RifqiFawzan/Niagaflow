@@ -1,39 +1,59 @@
-# Cara Deploy NiagaFlow
+# Cara Deploy NiagaFlow (Vercel + Neon)
 
-Panduan ini menjelaskan cara menaruh NiagaFlow online supaya bisa didemokan.
+Panduan ini menjelaskan cara menaruh NiagaFlow online di Vercel supaya bisa didemokan.
 
-**Status:** berkas konfigurasi dan langkah-langkah sudah siap, tetapi **belum dijalankan**. Deploy butuh akun hosting, dan itu harus dilakukan pemilik proyek. Langkah di bawah ini untuk Anda jalankan sendiri.
+**Status:** berkas konfigurasi sudah siap dan sudah diuji. Langkah di bawah ini **belum dijalankan** karena butuh akun Vercel milik pemilik proyek.
 
-## Bagian yang akan dibuat
+## Susunan yang dipakai
 
-| Bagian | Isi | Contoh layanan |
+| Bagian | Layanan | Peran |
 |---|---|---|
-| Frontend | React hasil build (`vite build`) | Vercel, Netlify |
-| Backend | Express (`node dist/server.js`) | Render, Railway |
-| Database | PostgreSQL terkelola | Neon, Supabase, Railway |
+| Frontend | Vercel | Menyajikan berkas React hasil build |
+| Backend | Vercel (project kedua) | Menjalankan API Express |
+| Database | Neon | Menyimpan data PostgreSQL |
 
-Tiga bagian ini terpisah. Frontend hanya menyajikan berkas statis, backend menjalankan API, database menyimpan data.
+Frontend dan backend dibuat sebagai **dua project Vercel terpisah** dari repo yang sama. Alasannya: keduanya punya perintah build dan hasil keluaran yang berbeda.
 
-## Langkah 1 — Siapkan database
+Alamat yang akan terbentuk:
 
-1. Buat database PostgreSQL di layanan pilihan Anda.
-2. Salin connection string-nya. Pastikan ada `?sslmode=require` di akhir, karena database terkelola biasanya menolak koneksi tanpa SSL.
+```
+https://niagaflow-web.vercel.app       <- frontend
+https://niagaflow-api.vercel.app       <- backend
+```
 
-## Langkah 2 — Deploy backend
+## Langkah 1 — Siapkan database di Neon
 
-1. Buat layanan baru, arahkan ke repo ini, dan set folder kerja ke `apps/api`.
-2. **Build command:** `npm run deploy:build`
-3. **Start command:** `npm run start`
-4. Isi environment variables berikut (lihat `.env.production.example`):
+1. Buat akun di neon.tech, lalu buat project baru.
+2. Salin **connection string**-nya. Bentuknya seperti ini:
+
+   ```
+   postgresql://user:password@ep-xxx.aws.neon.tech/niagaflow?sslmode=require
+   ```
+
+3. Pastikan ada `?sslmode=require` di akhir. Neon menolak koneksi tanpa SSL.
+4. Simpan string ini, nanti dipakai di Langkah 2 dan 4.
+
+## Langkah 2 — Deploy backend ke Vercel
+
+Buat project Vercel **pertama** dari repo ini.
+
+| Setelan | Nilai |
+|---|---|
+| **Root Directory** | `apps/api` |
+| **Framework Preset** | Other (biarkan default bila tidak ada pilihan) |
+| **Build Command** | `npm install && npx prisma generate && npx prisma migrate deploy && npm run build` |
+| **Output Directory** | biarkan kosong |
+| **Install Command** | biarkan default |
+
+Lalu isi **Environment Variables** berikut:
 
 | Nama | Nilai |
 |---|---|
 | `DATABASE_URL` | Connection string dari Langkah 1 |
-| `NODE_ENV` | `production` |
-| `SESSION_SECRET` | String acak panjang (lihat cara di bawah) |
-| `WEB_ORIGIN` | URL frontend nanti (isi setelah Langkah 3) |
-| `TRUST_PROXY` | `true` |
+| `SESSION_SECRET` | String acak panjang, cara membuatnya di bawah |
+| `WEB_ORIGIN` | `https://niagaflow-web.vercel.app` (sesuaikan setelah Langkah 3) |
 | `DEMO_PASSWORD` | Password akun demo, minimal 12 karakter |
+| `TRUST_PROXY` | `true` |
 
 Membuat `SESSION_SECRET`:
 
@@ -41,46 +61,93 @@ Membuat `SESSION_SECRET`:
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-5. Setelah backend online, isi data contoh. Jalankan sekali dari komputer Anda, arahkan ke database produksi:
+**Catatan:** `NODE_ENV` **tidak perlu diisi**. Vercel sudah menyetelnya ke `production` sendiri. Kalau diisi ulang, malah berisiko bentrok.
+
+Setelah deploy selesai, uji backendnya: buka `https://niagaflow-api.vercel.app/api/v1/health`. Harus menjawab `200`.
+
+## Langkah 3 — Isi data contoh
+
+Jalankan dari komputer Anda, diarahkan ke database produksi:
 
 ```bash
 cd apps/api
-NODE_ENV=production DEMO_PASSWORD="password-demo-anda" DATABASE_URL="..." npx prisma db seed
+DATABASE_URL="connection-string-neon" \
+DEMO_PASSWORD="password-demo-anda" \
+NODE_ENV=production \
+npx prisma db seed
 ```
 
-Seed akan **menolak jalan** kalau `NODE_ENV=production` tapi `DEMO_PASSWORD` kosong atau kurang dari 12 karakter. Ini sengaja, supaya demo publik tidak memakai password lemah.
+Di PowerShell:
 
-## Langkah 3 — Deploy frontend
+```powershell
+cd apps/api
+$env:DATABASE_URL="connection-string-neon"
+$env:DEMO_PASSWORD="password-demo-anda"
+$env:NODE_ENV="production"
+npx prisma db seed
+```
 
-1. Buat layanan baru di layanan static hosting, arahkan ke repo ini, folder `apps/web`.
-2. **Build command:** `npm install && npm run build`
-3. **Output directory:** `apps/web/dist`
-4. Tambahkan satu environment variable: `VITE_API_URL` berisi URL backend dari Langkah 2.
+Seed akan **menolak jalan** kalau `DEMO_PASSWORD` kosong atau kurang dari 12 karakter. Ini sengaja: demo publik tidak boleh memakai password lemah.
 
-## Langkah 4 — Sambungkan keduanya
+## Langkah 4 — Deploy frontend ke Vercel
 
-1. Kembali ke backend, ubah `WEB_ORIGIN` menjadi URL frontend yang sebenarnya. Ini penting: CORS akan menolak permintaan dari origin lain.
-2. Pastikan tidak ada garis miring di akhir URL (`https://contoh.vercel.app`, bukan `https://contoh.vercel.app/`).
+Buat project Vercel **kedua** dari repo yang sama.
+
+| Setelan | Nilai |
+|---|---|
+| **Root Directory** | `apps/web` |
+| **Framework Preset** | Vite |
+| **Build Command** | biarkan default (`npm run build`) |
+| **Output Directory** | biarkan default (`dist`) |
+
+Isi satu environment variable:
+
+| Nama | Nilai |
+|---|---|
+| `VITE_API_URL` | `https://niagaflow-api.vercel.app` (URL backend dari Langkah 2, tanpa garis miring di akhir) |
+
+Berkas `vercel.json` di folder `apps/web` sudah mengatur build dan menambahkan aturan *rewrite* supaya halaman seperti `/orders/:id` bisa dibuka langsung tanpa error 404.
+
+**Penting:** env `VITE_API_URL` ditanam saat build. Kalau nanti diubah, frontend harus di-deploy ulang.
+
+## Langkah 5 — Sambungkan keduanya
+
+1. Kembali ke project **backend**, ubah `WEB_ORIGIN` menjadi URL frontend yang sebenarnya.
+2. Pastikan tidak ada garis miring di akhir (`https://niagaflow-web.vercel.app`, bukan dengan `/`).
 3. Deploy ulang backend agar setelan baru terpakai.
 
-## Langkah 5 — Uji hasilnya
+Tanpa langkah ini, CORS akan menolak permintaan dari frontend dan login akan gagal.
+
+## Langkah 6 — Uji hasilnya
 
 1. Buka URL frontend.
-2. Masuk dengan akun demo. Passwordnya = `DEMO_PASSWORD` yang Anda isi.
+2. Masuk dengan `owner@niagaflow.test` dan password = `DEMO_PASSWORD` yang Anda isi.
 3. Jalankan alur utama: buat pesanan, ubah statusnya, cek dashboard dan laporan.
-4. Buka `<URL-backend>/docs` untuk memastikan Swagger UI juga hidup.
+4. Buka `https://niagaflow-api.vercel.app/docs` untuk memastikan Swagger UI hidup.
 
 ## Catatan keamanan
 
-- `SESSION_SECRET` di production wajib diisi. Backend akan menolak jalan tanpa itu.
-- Cookie sesi otomatis `Secure` di production, artinya hanya terkirim lewat HTTPS. Jadi backend harus benar-benar HTTPS.
-- Rate limit login berbasis IP. `TRUST_PROXY=true` wajib di hosting yang memakai proxy, supaya IP pengunjung terbaca benar. Kalau tidak, semua pengunjung dihitung sebagai satu IP.
+- `SESSION_SECRET` wajib diisi di production. Backend menolak jalan tanpa itu.
+- Cookie sesi otomatis `Secure` di production, jadi hanya terkirim lewat HTTPS. Vercel sudah HTTPS.
+- Rate limit login dihitung per IP. `TRUST_PROXY=true` wajib karena Vercel memakai proxy. Tanpa itu, semua pengunjung dihitung sebagai satu IP dan satu orang bisa memblokir semua.
+- **Rate limit disimpan di memori.** Di Vercel, tiap instance fungsi punya memori sendiri, jadi batasnya tidak benar-benar global. Untuk demo portofolio ini memadai. Kalau nanti dipakai sungguhan, ganti ke Redis/Upstash.
 - Jangan pakai data pelanggan nyata untuk demo. Data hasil seed semuanya fiktif.
 
 ## Update setelah kode berubah
 
 Setiap kali skema database berubah:
 
-1. Buat migrasi baru di lokal: `npx prisma migrate dev -w apps/api`
+1. Buat migrasi di lokal: `npx prisma migrate dev -w apps/api`
 2. Commit folder `apps/api/prisma/migrations`.
-3. Deploy backend lagi. Build command sudah memuat `prisma migrate deploy`, jadi migrasi ikut jalan.
+3. Deploy ulang backend. Build Command sudah memuat `prisma migrate deploy`, jadi migrasi ikut jalan.
+
+## Kalau ada masalah
+
+| Gejala | Penyebab yang paling sering |
+|---|---|
+| Halaman 404 saat dibuka langsung | `vercel.json` belum ikut ter-deploy di project frontend |
+| Login gagal, tidak ada pesan | `WEB_ORIGIN` di backend belum sama dengan URL frontend |
+| Error CORS di console browser | Sama seperti di atas, atau ada garis miring di akhir URL |
+| "SESSION_SECRET wajib di-set" | Env `SESSION_SECRET` belum diisi di project backend |
+| Frontend memanggil localhost | Env `VITE_API_URL` belum diisi, atau frontend belum di-deploy ulang setelah diisi |
+| Error koneksi database | Connection string kurang `?sslmode=require` |

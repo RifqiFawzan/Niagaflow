@@ -126,11 +126,16 @@ Diagram relasi (ERD) ada di [`docs/ERD.md`](docs/ERD.md).
 
 ## Deployment
 
-**Status: belum dijalankan.** Berkas dan langkahnya sudah siap, tapi deploy butuh akun hosting milik pemilik proyek.
+**Status: berkas konfigurasi siap, deploy belum dijalankan** (butuh akun hosting pemilik proyek).
 
-Panduan langkah demi langkah ada di [`docs/DEPLOY.md`](docs/DEPLOY.md). Ringkasnya: frontend ke layanan static hosting, backend ke layanan Node, database PostgreSQL terkelola, lalu isi environment variables dari `.env.production.example`.
+Rencana yang dipakai: frontend dan backend ke **Vercel** (dua project terpisah dari repo yang sama), database ke **Neon**.
 
-Satu hal yang sering terlewat: frontend di hosting **wajib** diberi env `VITE_API_URL` berisi URL backend. Tanpa itu, permintaan API akan menuju domain frontend sendiri dan login akan gagal. Di lokal env ini boleh kosong karena ada proxy dev Vite.
+Panduan langkah demi langkah ada di [`docs/DEPLOY.md`](docs/DEPLOY.md). Isi environment variables mengikuti [`.env.production.example`](.env.production.example).
+
+Dua hal yang paling sering bikin gagal:
+
+1. Frontend **wajib** diberi env `VITE_API_URL` berisi URL backend. Tanpa itu, permintaan API menuju domain frontend sendiri dan login gagal. Di lokal env ini boleh kosong karena ada proxy dev Vite.
+2. Backend **wajib** diberi `WEB_ORIGIN` berisi URL frontend. Kalau tidak cocok, CORS menolak semua permintaan.
 
 ## Catatan
 
