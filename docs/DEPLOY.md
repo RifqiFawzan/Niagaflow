@@ -105,10 +105,13 @@ Isi satu environment variable:
 | Nama | Nilai |
 |---|---|
 | `VITE_API_URL` | `https://niagaflow-api.vercel.app` (URL backend dari Langkah 2, tanpa garis miring di akhir) |
+| `VITE_DEMO_PASSWORD` | Password demo yang sama dengan `DEMO_PASSWORD` di backend. Dipakai tombol isi-otomatis "Pemilik"/"Staf" di halaman login |
 
 Berkas `vercel.json` di folder `apps/web` sudah mengatur build dan menambahkan aturan *rewrite* supaya halaman seperti `/orders/:id` bisa dibuka langsung tanpa error 404.
 
-**Penting:** env `VITE_API_URL` ditanam saat build. Kalau nanti diubah, frontend harus di-deploy ulang.
+**Penting:** kedua env di atas ditanam saat build. Kalau nanti diubah, frontend harus di-deploy ulang.
+
+**Peringatan:** nilai berawalan `VITE_` ikut terkunci ke berkas JavaScript bundel dan terbaca siapa pun lewat browser. Jangan pernah meletakkan rahasia di sana. Karena itu tombol isi-otomatis hanya layak dipakai untuk akun demo, bukan akun sungguhan. Bila tidak ingin password demo terekspos, hapus saja baris `VITE_DEMO_PASSWORD` — tombol isi-otomatis akan kembali memakai `password123` dan secara otomatis tidak berguna di produksi.
 
 ## Langkah 5 — Sambungkan keduanya
 
@@ -150,4 +153,6 @@ Setiap kali skema database berubah:
 | Error CORS di console browser | Sama seperti di atas, atau ada garis miring di akhir URL |
 | "SESSION_SECRET wajib di-set" | Env `SESSION_SECRET` belum diisi di project backend |
 | Frontend memanggil localhost | Env `VITE_API_URL` belum diisi, atau frontend belum di-deploy ulang setelah diisi |
+| Login sukses tapi langsung diminta login lagi | Cookie sesi tidak dikirim karena frontend dan backend di domain berbeda. Cek `WEB_ORIGIN` di backend harus persis URL frontend, tanpa garis miring |
+| Tombol demo mengisi password salah | Env `VITE_DEMO_PASSWORD` belum diisi di project frontend, atau frontend belum di-deploy ulang |
 | Error koneksi database | Connection string kurang `?sslmode=require` |

@@ -49,7 +49,7 @@ export function LoginPage() {
 
   const prefill = (role: "owner" | "staff") => {
     setEmail(`${role}@niagaflow.test`);
-    setPassword("password123");
+    setPassword(import.meta.env.VITE_DEMO_PASSWORD ?? "password123");
     setError(null);
   };
 

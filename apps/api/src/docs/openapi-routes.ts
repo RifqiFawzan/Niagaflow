@@ -51,7 +51,9 @@ registry.registerPath({
   tags: ["Auth"],
   summary: "Masuk dan dapatkan cookie sesi",
   description:
-    "Berhasil: mengirim cookie `session` (HttpOnly, SameSite=Lax) dan data user. " +
+    "Berhasil: mengirim cookie `session` (HttpOnly, SameSite=None di production " +
+    "karena frontend dan backend berdiri di domain berbeda; SameSite=Lax di lokal) " +
+    "dan data user. " +
     "Dibatasi 10 percobaan per menit per alamat IP.",
   request: { body: { content: { "application/json": { schema: loginInput } } } },
   responses: {
