@@ -21,16 +21,19 @@ Alur kerja: `workflow.md` — backlog → issues → kit → run loop (per issue
 ## P1 — setelah P0 stabil
 
 - [x] ISSUE-013 — Test integration alur inti (Vitest + Supertest) — Minggu 7 ✅ 20 Okt 2026
-- [ ] ISSUE-014 — Keamanan (rate limit login, CORS ketat) + OpenAPI + deployment — Minggu 7
+- [x] ISSUE-014 — Keamanan (rate limit login, CORS ketat) + OpenAPI + deployment — Minggu 7 ✅ 20 Okt 2026
+
+Sisa pekerjaan ISSUE-014: **demo online** belum dijalankan (butuh akun hosting pemilik). Semua berkas siap di `docs/DEPLOY.md` dan `.env.production.example`.
 
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 
 Blocking sudah diperbaiki (commit perbaikan gate 3). Berikut yang ditunda:
 
 - [x] Batas tanggal laporan: `from` di-parse sebagai UTC sementara `to` lokal → bisa meleset 1 hari di perbatasan. **Selesai di ISSUE-013**: `resolveRange` kini menyelaraskan `from` ke awal hari lokal; test regresi ditambahkan.
-- [ ] `/customers` tersembunyi dari nav staf tetapi route masih bisa diakses via URL langsung (hanya baca; tulis tetap owner-only). Konsistenkan saat ISSUE-014.
-- [ ] Dead code di `Topbar`. Rapikan saat ISSUE-014.
+- [x] `/customers` tersembunyi dari nav staf tetapi route masih bisa diakses via URL langsung (hanya baca; tulis tetap owner-only). Konsistenkan saat ISSUE-014. **Selesai**: menu Pelanggan kini tampil untuk staf, sesuai perilaku API (staf memang boleh membaca). Tulis tetap owner-only, dibuktikan test.
+- [x] Dead code di `Topbar`. Rapikan saat ISSUE-014. **Selesai**: dihapus dari `Nav.tsx`.
 - [ ] Tanggal selesai ISSUE-011 di dokumen tertulis 19 Okt, padahal commitnya 20 Okt. Dikoreksi pada commit perbaikan ini.
+- [ ] Riwayat Git masih memuat password DB dev lokal `niagaflow_dev_2026` dan satu `SESSION_SECRET` uji di commit lama. Sudah diganti di commit ISSUE-014, tapi belum dihapus dari riwayat. Butuh rewrite history — menunggu izin pemilik.
 
 Disclosure: file frontend ISSUE-010 ikut terbundel ke commit ISSUE-001 (deviasi backfill). `app.ts` di-rewrite bertahap per commit agar tiap commit tetap buildable.
 

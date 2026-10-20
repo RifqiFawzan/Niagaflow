@@ -3,8 +3,32 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+/**
+ * Password akun demo.
+ *
+ * Di lokal/dev dipakai "password123" supaya test dan dev server tetap jalan
+ * tanpa setup tambahan. Di production password WAJIB diisi lewat env
+ * DEMO_PASSWORD, supaya demo publik tidak memakai password lemah.
+ */
+function resolveDemoPassword(): string {
+  const isProduction = process.env.NODE_ENV === "production";
+  const fromEnv = process.env.DEMO_PASSWORD;
+
+  if (isProduction) {
+    if (!fromEnv || fromEnv.length < 12) {
+      throw new Error(
+        "DEMO_PASSWORD wajib di-set (minimal 12 karakter) saat seed di production."
+      );
+    }
+    return fromEnv;
+  }
+
+  return fromEnv ?? "password123";
+}
+
 async function main() {
-  const passwordHash = await bcrypt.hash("password123", 10);
+  const demoPassword = resolveDemoPassword();
+  const passwordHash = await bcrypt.hash(demoPassword, 10);
 
   await prisma.user.upsert({
     where: { email: "owner@niagaflow.test" },
@@ -66,9 +90,9 @@ async function main() {
   }
 
   console.log("Seed selesai.");
-  console.log("Akun demo (password: password123):");
-  console.log("  owner@niagaflow.test (owner)");
-  console.log("  staff@niagaflow.test (staff)");
+  console.log("Akun demo:");
+  console.log(`  owner@niagaflow.test (owner)  -- password: ${demoPassword}`);
+  console.log(`  staff@niagaflow.test (staff)  -- password: ${demoPassword}`);
 }
 
 main()

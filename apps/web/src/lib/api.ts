@@ -25,9 +25,20 @@ export function isApiErrorCode(err: unknown, code: string): boolean {
   return err instanceof ApiRequestError && err.code === code;
 }
 
+/**
+ * Alamat dasar API.
+ *
+ * Di lokal kosong, sehingga permintaan memakai path relatif `/api/v1` dan
+ * diteruskan proxy dev Vite ke http://localhost:4000.
+ *
+ * Di hosting, isi VITE_API_URL dengan URL backend (tanpa garis miring di akhir),
+ * mis. "https://niagaflow-api.onrender.com".
+ */
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
+
 /** Fetch wrapper: base /api/v1, selalu kirim cookie, error -> ApiRequestError. */
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api/v1${path}`, {
+  const res = await fetch(`${API_BASE}/api/v1${path}`, {
     credentials: "include",
     headers: {
       ...(init?.body ? { "Content-Type": "application/json" } : {}),

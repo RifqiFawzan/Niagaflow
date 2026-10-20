@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -24,7 +23,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/products", label: "Produk", icon: Package },
   { to: "/categories", label: "Kategori", icon: Tags, ownerOnly: true },
-  { to: "/customers", label: "Pelanggan", icon: Users, ownerOnly: true },
+  { to: "/customers", label: "Pelanggan", icon: Users },
   { to: "/orders", label: "Pesanan", icon: ReceiptText },
   { to: "/reports", label: "Laporan", icon: TrendingUp, ownerOnly: true },
 ];
@@ -59,14 +58,5 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         </NavLink>
       ))}
     </nav>
-  );
-}
-
-/** Kompatibilitas: AppLayout baru memakai header sendiri. */
-export function Topbar({ children }: { children?: ReactNode }) {
-  return (
-    <header className="bg-background flex h-14 items-center border-b px-4">
-      {children}
-    </header>
   );
 }

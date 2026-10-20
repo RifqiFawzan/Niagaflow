@@ -136,6 +136,64 @@ describe("izin role", () => {
     expect(res.status).toBe(201);
     expect(res.body.data).toMatchObject({ sku: "NEW-OWNER-001", price: 12000 });
   });
+
+  it("staf boleh MEMBACA pelanggan (menu Pelanggan tampil untuk staf)", async () => {
+    const cookie = await loginCookie(fx.staff.email);
+
+    const list = await agent().get("/api/v1/customers").set("Cookie", cookie);
+    expect(list.status).toBe(200);
+
+    const detail = await agent().get(`/api/v1/customers/${fx.budi.id}`).set("Cookie", cookie);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data).toMatchObject({ name: "Budi Santoso" });
+  });
+
+  it("staf TIDAK boleh menambah atau mengubah pelanggan → 403", async () => {
+    const cookie = await loginCookie(fx.staff.email);
+
+    const create = await agent()
+      .post("/api/v1/customers")
+      .set("Cookie", cookie)
+      .send({ name: "Pelanggan Baru" });
+    expect(create.status).toBe(403);
+
+    const update = await agent()
+      .patch(`/api/v1/customers/${fx.budi.id}`)
+      .set("Cookie", cookie)
+      .send({ name: "Diubah Staf" });
+    expect(update.status).toBe(403);
+
+    // Pastikan tidak ada data yang berubah.
+    const after = await prisma.customer.findUnique({ where: { id: fx.budi.id } });
+    expect(after?.name).toBe("Budi Santoso");
+  });
+});
+
+describe("rate limit login", () => {
+  it("percobaan login berulang dibatasi → 429 RATE_LIMITED", async () => {
+    // Batasnya 10 percobaan/menit per IP, dihitung sejak percobaan pertama.
+    // Jadi percobaan ke-11 harus ditolak. Tidak ada login sukses lebih dulu
+    // di test ini, supaya jatahnya tidak terpakai.
+    for (let i = 1; i <= 10; i++) {
+      const res = await agent()
+        .post("/api/v1/auth/login")
+        .send({ email: fx.owner.email, password: "password-salah" });
+      expect(res.status, `percobaan ke-${i} masih boleh dicoba`).toBe(401);
+    }
+
+    const blocked = await agent()
+      .post("/api/v1/auth/login")
+      .send({ email: fx.owner.email, password: "password-salah" });
+
+    expect(blocked.status).toBe(429);
+    expect(blocked.body).toMatchObject({ success: false, error: { code: "RATE_LIMITED" } });
+
+    // Login dengan password benar pun ikut diblokir selama jendela masih penuh.
+    const correct = await agent()
+      .post("/api/v1/auth/login")
+      .send({ email: fx.owner.email, password: "password123" });
+    expect(correct.status).toBe(429);
+  });
 });
 
 describe("SKU unik", () => {
