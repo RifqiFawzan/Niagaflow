@@ -10,6 +10,7 @@ import {
 
 import { api, errorMessage } from "@/lib/api";
 import { formatDate, formatRupiah } from "@/lib/format";
+import { useAuth } from "@/features/auth/AuthContext";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -22,11 +23,13 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
+import { SalesTrendChart } from "./SalesTrendChart";
 import type { DashboardData } from "@/types";
 
 const CARD_ICONS = [Package, ReceiptText, Wallet, AlertTriangle];
 
 export function DashboardPage() {
+  const { user } = useAuth();
   const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: ["reports", "dashboard"],
     queryFn: () => api<DashboardData>("/reports/dashboard"),
@@ -99,6 +102,8 @@ export function DashboardPage() {
           );
         })}
       </div>
+
+      {user?.role === "owner" && <SalesTrendChart />}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card>

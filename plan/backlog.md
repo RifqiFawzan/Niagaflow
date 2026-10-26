@@ -22,6 +22,7 @@ Alur kerja: `workflow.md` — backlog → issues → kit → run loop (per issue
 
 - [x] ISSUE-013 — Test integration alur inti (Vitest + Supertest) — Minggu 7 ✅ 20 Okt 2026
 - [x] ISSUE-014 — Keamanan (rate limit login, CORS ketat) + OpenAPI + deployment — Minggu 7 ✅ 20 Okt 2026
+- [x] ISSUE-015 — Grafik tren penjualan di dashboard (Recharts) — 26 Okt 2026
 
 Sisa pekerjaan ISSUE-014: **demo online** belum dijalankan (butuh akun hosting pemilik). Semua berkas siap di `docs/DEPLOY.md` dan `.env.production.example`.
 

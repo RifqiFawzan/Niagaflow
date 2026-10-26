@@ -106,3 +106,15 @@ export type TopProduct = {
   revenue: number | string;
   ordersCount: number;
 };
+
+export type SalesTrendPoint = {
+  date: string; // "YYYY-MM-DD" (tanggal lokal server)
+  sales: number | string;
+  orders: number;
+};
+
+export type SalesTrend = {
+  from: string;
+  to: string;
+  points: SalesTrendPoint[];
+};

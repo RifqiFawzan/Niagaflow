@@ -24,6 +24,15 @@ function resolveRange(from?: Date, to?: Date) {
   return { start, end };
 }
 
+// Kunci "YYYY-MM-DD" berdasarkan tanggal lokal server (bukan UTC),
+// supaya pengelompokan per hari konsisten dengan resolveRange.
+function localDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 async function getLowStock() {
   const products = await prisma.product.findMany({
     where: { isActive: true },
@@ -117,6 +126,50 @@ router.get(
         newCustomers: customersInPeriod,
       },
     });
+  })
+);
+
+// Tren penjualan harian (owner) — dipakai grafik dashboard.
+// Hanya menghitung pesanan berstatus `completed`, sama seperti KPI dan summary,
+// supaya angka di grafik dan kartu tidak saling bertentangan.
+router.get(
+  "/sales-trend",
+  requireRole("owner"),
+  asyncHandler(async (req, res) => {
+    const parsed = rangeSchema.safeParse(req.query);
+    if (!parsed.success) {
+      throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0].message);
+    }
+    const { start, end } = resolveRange(parsed.data.from, parsed.data.to);
+
+    // Ambil ringkas (createdAt + total saja) lalu kelompokkan per hari lokal di JS.
+    // Ini menyelaraskan batas hari dengan resolveRange (waktu lokal server) sehingga
+    // tidak ada selisih zona-waktu antara grafik dan ringkasan.
+    const orders = await prisma.order.findMany({
+      where: { status: OrderStatus.completed, createdAt: { gte: start, lte: end } },
+      select: { createdAt: true, total: true },
+    });
+
+    const byDay = new Map<string, { sales: number; orders: number }>();
+    // Isi semua hari dalam rentang dengan nol supaya sumbu-x grafik utuh.
+    const cursor = new Date(start);
+    while (cursor <= end) {
+      byDay.set(localDateKey(cursor), { sales: 0, orders: 0 });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    for (const o of orders) {
+      const key = localDateKey(o.createdAt);
+      const bucket = byDay.get(key) ?? { sales: 0, orders: 0 };
+      bucket.sales += Number(o.total ?? 0);
+      bucket.orders += 1;
+      byDay.set(key, bucket);
+    }
+
+    const points = [...byDay.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, v]) => ({ date, sales: money(v.sales), orders: v.orders }));
+
+    res.json({ success: true, data: { from: start, to: end, points } });
   })
 );
 

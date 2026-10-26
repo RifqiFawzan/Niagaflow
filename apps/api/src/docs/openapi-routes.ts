@@ -467,6 +467,35 @@ registry.registerPath({
 
 registry.registerPath({
   method: "get",
+  path: `${BASE}/reports/sales-trend`,
+  tags: ["Laporan"],
+  summary: "Tren penjualan harian (owner)",
+  description:
+    "Deret penjualan per hari pada rentang tanggal. Hanya menghitung pesanan berstatus `completed`. Hari kosong diisi nol supaya sumbu grafik utuh. Waktu memakai zona waktu lokal server.",
+  request: { query: rangeQuery },
+  responses: {
+    200: jsonResponse(
+      "Tren penjualan harian.",
+      okSchema(
+        z.object({
+          from: z.string().optional(),
+          to: z.string().optional(),
+          points: z.array(
+            z.object({
+              date: z.string().openapi({ example: "2026-10-18" }),
+              sales: z.number().int(),
+              orders: z.number().int(),
+            })
+          ),
+        })
+      )
+    ),
+    ...securedResponses,
+  },
+});
+
+registry.registerPath({
+  method: "get",
   path: `${BASE}/reports/top-products`,
   tags: ["Laporan"],
   summary: "Produk terlaris (owner)",
