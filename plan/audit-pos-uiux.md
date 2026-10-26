@@ -1,0 +1,119 @@
+# Audit UI/UX — NiagaFlow
+
+Sumber: `plan/POS_UI_UX_Guideline.md`. Dijalankan mengikuti `workflow.md` (proyek eksisting):
+audit → tinjau pendekatan → backlog → issues → loop.
+
+Metode: cek 4 halaman (dashboard, produk, pesanan, laporan) lewat `playwright-cli` + baca kode.
+Cocokkan dengan checklist §3 dan kriteria penerimaan §17.
+
+---
+
+## 1. Ringkasan status
+
+Aplikasi sudah rapi dan konsisten untuk alur **owner** (dashboard, produk, pesanan, laporan).
+Sebagian besar checklist §3 terpenuhi.
+
+Namun pedoman ini dirancang untuk **sistem POS dengan 4 peran dan halaman kasir**.
+Aplikasi sekarang hanya punya **2 peran (owner, staff)** dan **belum punya halaman POS/kasir**.
+Karena itu banyak poin pedoman yang bukan "perbaikan UI", melainkan **fitur yang belum ada**.
+Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
+
+---
+
+## 2. Yang sudah sesuai (tidak perlu diubah)
+
+| Poin pedoman | Status | Bukti |
+|---|---|---|
+| §3.1 Owner lihat penjualan cepat | ✅ | Dashboard halaman pertama, KPI di atas |
+| §3.2 Filter periode mudah ditemukan | ✅ | Laporan punya filter tanggal; Dashboard punya toggle 7/30 hari |
+| §3.3 Grafik ada judul, periode, satuan, tooltip | ✅ | `SalesTrendChart`: judul, footer periode, sumbu rupiah, tooltip per hari |
+| §3.6 Produk mudah dicari & difilter | ✅ | Cari nama, filter kategori, filter "Stok menipis", label status |
+| §3.7 Form ada label & pesan validasi | ✅ | Zod di backend + validasi form (ISSUE-006) |
+| §3.8 Ada state loading/kosong/sukses/gagal | ✅ | `states.tsx` (ISSUE-004) |
+| §3.9 Layout nyaman desktop & tablet | ✅ | Nav desktop + drawer mobile (ISSUE-014) |
+| §3.10 Hak akses dicek backend | ✅ | `requireRole` (ISSUE-002) |
+| §3.11 Angka dashboard = data sumber | ✅ | Total Rp 55.000 cocok dengan KPI & grafik |
+| §5.1 Urutan KPI | ✅ | Penjualan hari ini, Pesanan hari ini, Stok menipis, Pelanggan baru |
+| §7 Produk: cari, filter status, kolom tabel | ✅ | Nama, Kategori, Harga, Stok, Status; tombol Tambah/Ubah/Hapus |
+| §8 Pesanan: cari, filter status, filter tanggal, badge status | ✅ | Sudah ada semua + "Pesanan baru" |
+| §9 Laporan: filter tanggal, KPI, pesanan per status, produk terlaris, ekspor CSV | ✅ | Sudah ada (kecuali penjualan per kategori) |
+| §8.1 Konfirmasi hapus transaksi | ✅ | Dialog konfirmasi (ISSUE-006) |
+| §15.8 Keamanan password | ✅ | Tidak ada password di URL/log (ISSUE-002) |
+
+---
+
+## 3. Temuan berperingkat
+
+### P0 — menghalangi transaksi (belum ada fitur)
+
+1. **Belum ada halaman POS/kasir.** Pedoman §4, §5.2, §10.6–§10.9, §11 mendeskripsikan
+   kasir 2 panel (kiri cari produk + keranjang, kanan ringkasan tetap). Aplikasi sekarang
+   membuat pesanan lewat `/orders/new` berupa form penuh, bukan alur kasir cepat.
+   *Ini fitur baru, bukan polesan.*
+
+2. **Metode pembayaran belum dicatat.** Tidak ada kolom `paymentMethod` (tunai/QRIS/card)
+   di model pesanan. Pedoman §4, §8.2, §9, §10.3, §10.4, §17.2 mensyaratkannya.
+   *Perlu ubah skema DB + backend + frontend.*
+
+3. **Diskon produk & input kasir belum ada.** Pedoman §4.2, §10.10–§10.12 (diskon produk /
+   total, nominal / persen, input angka +/−). Sekarang hanya ada diskon total sederhana.
+
+### P1 — owner sulit ambil keputusan / data belum lengkap
+
+4. **Belum ada "Penjualan per kategori"** (donut, §9.5). Data kategori ada di produk,
+   jadi bisa dibuat endpoint baru + gabung ke OrderItem.
+
+5. **Produk terlaris masih tabel, bukan grafik batang horizontal** (§6.2). Data sudah ada
+   (`/reports/top-products`), tinggal ditampilkan sebagai `BarChart` yang diurutkan.
+
+6. **Riwayat pergerakan stok belum ada** (§15.5, §15.6, audit P1). Tabel stok hanya berubah
+   saat pesanan dibuat/dibatalkan. Belum ada form "Stok masuk" / "Stok keluar" + riwayat.
+
+7. **Kartu KPI dashboard belum satu periode** (§6.3). KPI memakai "hari ini" + "semua waktu",
+   sedangkan grafik memakai 7/30 hari. Pedoman minta satu filter periode untuk semua.
+
+8. **Peran belum 4 jenis** (§10.14 matriks akses). Sekarang owner + staff. Kasir, pengelola
+   stok, admin belum ada sebagai peran terpisah.
+
+### P2 — efisiensi / polesan kecil
+
+9. **Detail pesanan belum tampilkan metode bayar** (§8.2) — ikut terblokir no. 2.
+10. **Pencarian global belum ada** (§10.6, audit P1).
+11. **Label stok**: pedoman minta "Stok Rendah (sisa X)"; aplikasi memakai "Restock". Konsisten
+    tapi beda kata.
+12. **Tabel produk belum bisa diurutkan** (nama, harga, stok) — opsional di pedoman.
+13. **Desain sistem beda dari pedoman**: primer `#2563EB` biru + font Inter (§10.1–§10.2);
+    aplikasi memakai primer slate gelap + font bawaan. Bisa diubah, tapi ini seluruh tema.
+
+### P3 — rendah / opsional
+
+14. Ekspor PDF belum ada (§8.3, §15.4) — CSV sudah ada; PDF opsional.
+15. Notifikasi / inbox stok menipis belum ada (§15.8).
+16. Halaman pengaturan (profil, ganti password, kelola pengguna) belum ada (§12).
+
+---
+
+## 4. Konflik lingkup (perlu keputusan, bukan ditutupi)
+
+Pedoman mengasumsikan POS dengan 4 peran + halaman kasir + pembayaran + inventaris.
+Aplikasi sekarang adalah sistem pesanan/penjualan dengan 2 peran dan tanpa POS.
+
+- Menjalankan **seluruh** pedoman = membangun fitur baru besar (model DB baru:
+  `paymentMethod`, riwayat stok; halaman baru: POS, inventoris, pengaturan; peran baru).
+- Sebagian poin (P0 no. 1–3, P1 no. 6 & 8) **tidak bisa** dikerjakan tanpa keputusan Anda,
+  karena menyentuh skema data dan jumlah peran.
+- Polesan yang aman & bernilai tanpa mengubah lingkup: **P1 no. 4 & 5** (grafik kategori +
+  grafik batang produk terlaris), **P1 no. 7** (samakan periode KPI), dan sebagian **P2**.
+
+---
+
+## 5. Saran langkah
+
+Kerjakan bertahap, mulai dari yang aman dan bernilai:
+
+- **Tahap A (aman, tanpa ubah skema):** no. 4, 5, 7 + beberapa P2 (label stok, urut tabel).
+- **Tahap B (butuh keputusan Anda):** no. 1–3 (halaman POS + metode bayar + diskon),
+  no. 6 (riwayat stok), no. 8 (peran), no. 13 (ganti tema).
+
+Setelah Anda pilih tahap/lingkup, tiap item dipecah jadi issue (backlog → loop),
+lalu dikerjakan satu per satu.
