@@ -27,16 +27,16 @@ Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
 | §3.1 Owner lihat penjualan cepat | ✅ | Dashboard halaman pertama, KPI di atas |
 | §3.2 Filter periode mudah ditemukan | ✅ | Laporan punya filter tanggal; Dashboard punya toggle 7/30 hari |
 | §3.3 Grafik ada judul, periode, satuan, tooltip | ✅ | `SalesTrendChart`: judul, footer periode, sumbu rupiah, tooltip per hari |
-| §3.6 Produk mudah dicari & difilter | ✅ | Cari nama, filter kategori, filter "Stok menipis", label status |
+| §3.6 Produk mudah dicari & difilter | ✅ | Cari nama/SKU, filter kategori & arsip, label status "Aman/Menipis/Habis" (ISSUE-017) |
 | §3.7 Form ada label & pesan validasi | ✅ | Zod di backend + validasi form (ISSUE-006) |
 | §3.8 Ada state loading/kosong/sukses/gagal | ✅ | `states.tsx` (ISSUE-004) |
 | §3.9 Layout nyaman desktop & tablet | ✅ | Nav desktop + drawer mobile (ISSUE-014) |
 | §3.10 Hak akses dicek backend | ✅ | `requireRole` (ISSUE-002) |
 | §3.11 Angka dashboard = data sumber | ✅ | Total Rp 55.000 cocok dengan KPI & grafik |
-| §5.1 Urutan KPI | ✅ | Penjualan hari ini, Pesanan hari ini, Stok menipis, Pelanggan baru |
-| §7 Produk: cari, filter status, kolom tabel | ✅ | Nama, Kategori, Harga, Stok, Status; tombol Tambah/Ubah/Hapus |
+| §5 KPI cards + Aturan KPI | ✅ | 4 kartu (Produk aktif, Pesanan hari ini, Total penjualan, Stok menipis) — masing-masing punya hint periode/metrik. Contoh pedoman (rata-rata nilai transaksi, laba kotor) tidak dipenuhi: laba butuh HPP yang tidak ada di skema & dilarang dikarang; sifatnya saran ("urutan yang disarankan"). |
+| §7 Produk: cari, filter status, kolom tabel | ✅ | Nama, Kategori, Harga, Stok, Status; tombol Tambah/Ubah/Arsipkan (hapus lunak, sesuai "nonaktifkan" di pedoman §9) |
 | §8 Pesanan: cari, filter status, filter tanggal, badge status | ✅ | Sudah ada semua + "Pesanan baru" |
-| §9 Laporan: filter tanggal, KPI, pesanan per status, produk terlaris, ekspor CSV | ✅ | Sudah ada (kecuali penjualan per kategori) |
+| §9 Laporan: filter tanggal, KPI, pesanan per status, produk terlaris, ekspor CSV | ✅ | Semua ada; penjualan per kategori ditambahkan di ISSUE-016 |
 | §8.1 Konfirmasi hapus transaksi | ✅ | Dialog konfirmasi (ISSUE-006) |
 | §15.8 Keamanan password | ✅ | Tidak ada password di URL/log (ISSUE-002) |
 
@@ -61,16 +61,22 @@ Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
 ### P1 — owner sulit ambil keputusan / data belum lengkap
 
 4. **Belum ada "Penjualan per kategori"** (donut, §9.5). Data kategori ada di produk,
-   jadi bisa dibuat endpoint baru + gabung ke OrderItem.
+   jadi bisa dibuat endpoint baru + gabung ke OrderItem. **Selesai: ISSUE-016.**
 
 5. **Produk terlaris masih tabel, bukan grafik batang horizontal** (§6.2). Data sudah ada
    (`/reports/top-products`), tinggal ditampilkan sebagai `BarChart` yang diurutkan.
+   **Selesai: ISSUE-016.**
 
 6. **Riwayat pergerakan stok belum ada** (§15.5, §15.6, audit P1). Tabel stok hanya berubah
    saat pesanan dibuat/dibatalkan. Belum ada form "Stok masuk" / "Stok keluar" + riwayat.
 
 7. **Kartu KPI dashboard belum satu periode** (§6.3). KPI memakai "hari ini" + "semua waktu",
    sedangkan grafik memakai 7/30 hari. Pedoman minta satu filter periode untuk semua.
+   **Selesai sebagian (ISSUE-016):** ketiga grafik kini berbagi satu sakelar periode —
+   syarat §6.4 ("semua **grafik** dashboard mengikuti filter periode yang sama") terpenuhi.
+   Kartu KPI sengaja tetap "hari ini"/"semua waktu" dengan hint periode eksplisit; pedoman
+   §5 hanya "idealnya" menampilkan periode terpilih, dan mengikatkan KPI ke filter 7/30 hari
+   mengubah arti kartu untuk owner **dan** staf → keputusan produk, bukan perbaikan teknis.
 
 8. **Peran belum 4 jenis** (§10.14 matriks akses). Sekarang owner + staff. Kasir, pengelola
    stok, admin belum ada sebagai peran terpisah.
@@ -79,9 +85,12 @@ Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
 
 9. **Detail pesanan belum tampilkan metode bayar** (§8.2) — ikut terblokir no. 2.
 10. **Pencarian global belum ada** (§10.6, audit P1).
-11. **Label stok**: pedoman minta "Stok Rendah (sisa X)"; aplikasi memakai "Restock". Konsisten
-    tapi beda kata.
+11. **Label stok**: pedoman §9 minta status "Aman"/"Menipis"/"Habis"; aplikasi memakai
+    "Aktif"/"Stok menipis" tanpa beda untuk stok 0. **Selesai: ISSUE-017** — kini "Aman",
+    "Menipis (sisa X)", "Habis" (stok 0), "Diarsipkan".
 12. **Tabel produk belum bisa diurutkan** (nama, harga, stok) — opsional di pedoman.
+    **Koreksi:** pengurutan sudah ada lewat dropdown "Urutkan", tapi satu arah per kolom.
+    **Selesai: ISSUE-017** — nama/harga/stok kini tersedia dua arah.
 13. **Desain sistem beda dari pedoman**: primer `#2563EB` biru + font Inter (§10.1–§10.2);
     aplikasi memakai primer slate gelap + font bawaan. Bisa diubah, tapi ini seluruh tema.
 
@@ -112,6 +121,7 @@ Aplikasi sekarang adalah sistem pesanan/penjualan dengan 2 peran dan tanpa POS.
 Kerjakan bertahap, mulai dari yang aman dan bernilai:
 
 - **Tahap A (aman, tanpa ubah skema):** no. 4, 5, 7 + beberapa P2 (label stok, urut tabel).
+  **Selesai — ISSUE-016 (grafik + periode) dan ISSUE-017 (label stok + urut).**
 - **Tahap B (butuh keputusan Anda):** no. 1–3 (halaman POS + metode bayar + diskon),
   no. 6 (riwayat stok), no. 8 (peran), no. 13 (ganti tema).
 

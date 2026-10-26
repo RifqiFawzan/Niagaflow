@@ -6,6 +6,7 @@ import { Pencil, Plus, Search } from "lucide-react";
 
 import { api, errorMessage } from "@/lib/api";
 import { formatRupiah } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -160,8 +161,11 @@ export function ProductListPage() {
               <SelectContent>
                 <SelectItem value="createdAt:desc">Terbaru</SelectItem>
                 <SelectItem value="name:asc">Nama A-Z</SelectItem>
+                <SelectItem value="name:desc">Nama Z-A</SelectItem>
                 <SelectItem value="price:desc">Harga tertinggi</SelectItem>
+                <SelectItem value="price:asc">Harga terendah</SelectItem>
                 <SelectItem value="stock:asc">Stok terendah</SelectItem>
+                <SelectItem value="stock:desc">Stok tertinggi</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -246,11 +250,14 @@ export function ProductListPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <span
-                            className={
-                              low
-                                ? "font-semibold text-amber-600 tabular-nums"
-                                : "tabular-nums"
-                            }
+                            className={cn(
+                              "tabular-nums",
+                              product.stock === 0 &&
+                                "font-semibold text-red-600",
+                              low &&
+                                product.stock > 0 &&
+                                "font-semibold text-amber-600"
+                            )}
                           >
                             {product.stock}
                           </span>
@@ -260,14 +267,19 @@ export function ProductListPage() {
                           </span>
                         </TableCell>
                         <TableCell>
+                          {/* Status stok konsisten (pedoman §9): Aman / Menipis / Habis. */}
                           {product.isActive ? (
-                            low ? (
+                            product.stock === 0 ? (
+                              <Badge className="border-transparent bg-red-100 text-red-700">
+                                Habis
+                              </Badge>
+                            ) : low ? (
                               <Badge className="border-transparent bg-amber-100 text-amber-700">
-                                Stok menipis
+                                Menipis (sisa {product.stock})
                               </Badge>
                             ) : (
                               <Badge className="border-transparent bg-emerald-100 text-emerald-700">
-                                Aktif
+                                Aman
                               </Badge>
                             )
                           ) : (

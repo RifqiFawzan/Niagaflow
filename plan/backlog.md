@@ -34,7 +34,7 @@ Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekat
 
 - Tahap A (aman, tanpa ubah skema DB): grafik kategori, grafik batang produk terlaris, samakan periode KPI, label stok, urut tabel.
   - [x] Grafik kategori + batang produk terlaris + satu periode bersama — **ISSUE-016** ✅ 26 Okt 2026
-  - [ ] Label stok "Stok Rendah (sisa X)" (§7.2) + pengurutan kolom tabel produk — menunggu issue berikutnya
+  - [x] Label stok "Aman/Menipis (sisa X)/Habis" + urut tabel dua arah — **ISSUE-017** ✅ 26 Okt 2026
 - Tahap B (butuh keputusan, sentuh skema/lingkup): halaman POS/kasir, metode bayar, diskon produk, riwayat stok, peran 4 jenis, ganti tema.
 
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
