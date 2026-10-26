@@ -25,10 +25,10 @@ export function AppLayout() {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="bg-black/40 animate-in fade-in-0 duration-200"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="bg-background absolute inset-y-0 left-0 w-60 shadow-xl">
+          <aside className="bg-background animate-in slide-in-from-left duration-200 absolute inset-y-0 left-0 w-60 shadow-xl">
             <Sidebar onNavigate={() => setMobileOpen(false)} />
           </aside>
         </div>
