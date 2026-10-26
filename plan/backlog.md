@@ -35,7 +35,11 @@ Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekat
 - Tahap A (aman, tanpa ubah skema DB): grafik kategori, grafik batang produk terlaris, samakan periode KPI, label stok, urut tabel.
   - [x] Grafik kategori + batang produk terlaris + satu periode bersama — **ISSUE-016** ✅ 26 Okt 2026
   - [x] Label stok "Aman/Menipis (sisa X)/Habis" + urut tabel dua arah — **ISSUE-017** ✅ 26 Okt 2026
-- Tahap B (butuh keputusan, sentuh skema/lingkup): halaman POS/kasir, metode bayar, diskon produk, riwayat stok, peran 4 jenis, ganti tema.
+- Tahap B (butuh keputusan, sentuh skema/lingkup) — disetujui berurutan 26 Okt 2026:
+  - [x] ISSUE-018 — POS: metode bayar (Tunai/QRIS/Transfer) + uang diterima/kembalian + diskon Rp/% (P0, audit no. 1–3) ✅ 26 Okt 2026
+  - [ ] ISSUE-019 — Riwayat pergerakan stok: tabel StockMovement + form Stok masuk/keluar + halaman riwayat (P1, audit no. 6)
+  - [ ] ISSUE-020 — Peran 4 jenis (owner, kasir, pengelola stok, admin) + halaman kelola pengguna (P1, audit no. 8 + no. 16)
+  - [ ] ISSUE-021 — Ganti tema primer #2563EB + font Inter (P2, audit no. 13; screenshot README ikut diulang)
 
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 

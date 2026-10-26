@@ -16,6 +16,7 @@ type SerializableOrder = {
   subtotal: MoneyValue | null;
   discount: MoneyValue | null;
   total: MoneyValue | null;
+  amountPaid?: MoneyValue | null;
   items?: ReadonlyArray<{
     quantity: number;
     unitPrice?: MoneyValue | null;
@@ -29,6 +30,9 @@ export function serializeOrder<T extends SerializableOrder>(order: T) {
     subtotal: money(order.subtotal),
     discount: money(order.discount),
     total: money(order.total),
+    ...(order.amountPaid !== undefined
+      ? { amountPaid: order.amountPaid === null ? null : money(order.amountPaid) }
+      : {}),
     items: order.items?.map((item) => ({
       ...item,
       ...(item.unitPrice !== undefined ? { unitPrice: money(item.unitPrice) } : {}),

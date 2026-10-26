@@ -25,7 +25,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ErrorState, InlineLoading } from "@/components/ui/states";
-import type { Order, OrderStatus } from "@/types";
+import {
+  PAYMENT_METHOD_LABELS,
+  type Order,
+  type OrderStatus,
+} from "@/types";
 
 const NEXT_ACTIONS: Record<OrderStatus, OrderStatus[]> = {
   pending: ["processing", "cancelled"],
@@ -252,6 +256,46 @@ export function OrderDetailPage() {
                     </Button>
                   )}
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Pembayaran</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1.5 text-sm">
+              <div className="flex justify-between gap-3">
+                <span className="text-muted-foreground">Metode</span>
+                <span className="font-medium">
+                  {data.paymentMethod
+                    ? PAYMENT_METHOD_LABELS[data.paymentMethod]
+                    : "Belum dicatat"}
+                </span>
+              </div>
+              {data.amountPaid !== null && data.amountPaid !== undefined ? (
+                <>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted-foreground">Uang diterima</span>
+                    <span className="tabular-nums">
+                      {formatRupiah(data.amountPaid)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted-foreground">Kembalian</span>
+                    <span className="tabular-nums">
+                      {formatRupiah(
+                        Math.max(0, Number(data.amountPaid) - Number(data.total))
+                      )}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  {data.paymentMethod === "TUNAI"
+                    ? "Uang diterima tidak dicatat."
+                    : "Pembayaran non-tunai; jumlah diterima tidak relevan."}
+                </p>
               )}
             </CardContent>
           </Card>

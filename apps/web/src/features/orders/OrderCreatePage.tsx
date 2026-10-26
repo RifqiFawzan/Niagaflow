@@ -34,12 +34,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EmptyState, ErrorState, InlineLoading } from "@/components/ui/states";
-import type {
-  Category,
-  Customer,
-  Order,
-  Paginated,
-  Product,
+import {
+  PAYMENT_METHOD_LABELS,
+  type Category,
+  type Customer,
+  type Order,
+  type Paginated,
+  type PaymentMethod,
+  type Product,
 } from "@/types";
 
 const NONE = "none";
@@ -57,7 +59,13 @@ export function OrderCreatePage() {
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [lines, setLines] = useState<CartLine[]>([]);
-  const [discount, setDiscount] = useState("0");
+  const [discountMode, setDiscountMode] = useState<"nominal" | "percent">(
+    "nominal"
+  );
+  const [discountNominal, setDiscountNominal] = useState("0");
+  const [discountPercent, setDiscountPercent] = useState("0");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("TUNAI");
+  const [amountPaidInput, setAmountPaidInput] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -97,10 +105,35 @@ export function OrderCreatePage() {
     [lines]
   );
 
-  const discountValue = /^\d+$/.test(discount.trim()) ? Number(discount) : 0;
+  const discountNominalValid = /^\d+$/.test(discountNominal.trim());
+  const discountPercentValid =
+    /^\d+$/.test(discountPercent.trim()) && Number(discountPercent) <= 100;
+  const discountValue =
+    discountMode === "nominal"
+      ? discountNominalValid
+        ? Number(discountNominal)
+        : 0
+      : discountPercentValid
+        ? Math.floor((subtotal * Number(discountPercent)) / 100)
+        : 0;
+  const discountInvalid =
+    discountMode === "nominal" ? !discountNominalValid : !discountPercentValid;
+  const discountTooBig =
+    !discountInvalid && discountMode === "nominal" && discountValue > subtotal;
+
   const estimatedTotal = Math.max(0, subtotal - discountValue);
-  const discountInvalid = !/^\d+$/.test(discount.trim());
-  const discountTooBig = !discountInvalid && discountValue > subtotal;
+
+  const isCash = paymentMethod === "TUNAI";
+  const amountPaidValid = /^\d+$/.test(amountPaidInput.trim());
+  const amountPaidValue = amountPaidValid ? Number(amountPaidInput) : null;
+  const amountPaidInvalid =
+    isCash && amountPaidInput.trim() !== "" && !amountPaidValid;
+  const amountTooSmall =
+    isCash && amountPaidValue !== null && amountPaidValue < estimatedTotal;
+  const change =
+    isCash && amountPaidValue !== null && !amountTooSmall
+      ? amountPaidValue - estimatedTotal
+      : null;
 
   const addProduct = (product: Product) => {
     setError(null);
@@ -145,6 +178,11 @@ export function OrderCreatePage() {
             quantity: l.quantity,
           })),
           discount: discountValue,
+          paymentMethod,
+          amountPaid:
+            isCash && amountPaidValue !== null && !amountPaidInvalid
+              ? amountPaidValue
+              : null,
           notes: notes.trim() ? notes.trim() : null,
         }),
       }),
@@ -179,11 +217,23 @@ export function OrderCreatePage() {
       return;
     }
     if (discountInvalid) {
-      setError("Diskon harus angka bulat 0 atau lebih.");
+      setError(
+        discountMode === "nominal"
+          ? "Diskon harus angka bulat 0 atau lebih."
+          : "Diskon persen harus angka 0–100."
+      );
       return;
     }
     if (discountTooBig) {
       setError("Diskon tidak boleh melebihi subtotal.");
+      return;
+    }
+    if (amountPaidInvalid) {
+      setError("Uang diterima harus angka bulat.");
+      return;
+    }
+    if (amountTooSmall) {
+      setError("Uang diterima kurang dari total pesanan.");
       return;
     }
     setError(null);
@@ -422,20 +472,46 @@ export function OrderCreatePage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="diskon">Diskon (Rp)</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="diskon">Diskon</Label>
+                  <Select
+                    value={discountMode}
+                    onValueChange={(v) =>
+                      setDiscountMode(v as "nominal" | "percent")
+                    }
+                  >
+                    <SelectTrigger
+                      className="h-8 w-20"
+                      aria-label="Tipe diskon"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="nominal">Rp</SelectItem>
+                      <SelectItem value="percent">%</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Input
                   id="diskon"
                   inputMode="numeric"
-                  value={discount}
+                  value={discountMode === "nominal" ? discountNominal : discountPercent}
                   onChange={(e) => {
-                    setDiscount(e.target.value);
+                    const raw = e.target.value.replace(/\D/g, "");
+                    if (discountMode === "nominal") {
+                      setDiscountNominal(raw || "0");
+                    } else {
+                      setDiscountPercent(raw || "0");
+                    }
                     setError(null);
                   }}
                   aria-invalid={discountInvalid || discountTooBig}
                 />
                 {discountInvalid && (
                   <p className="text-destructive text-xs">
-                    Diskon harus angka bulat 0 atau lebih.
+                    {discountMode === "nominal"
+                      ? "Diskon harus angka bulat 0 atau lebih."
+                      : "Diskon persen harus angka 0–100."}
                   </p>
                 )}
                 {discountTooBig && (
@@ -443,7 +519,68 @@ export function OrderCreatePage() {
                     Diskon tidak boleh melebihi subtotal.
                   </p>
                 )}
+                {discountMode === "percent" && !discountInvalid && (
+                  <p className="text-muted-foreground text-xs">
+                    Nilai diskon: {formatRupiah(discountValue)}
+                  </p>
+                )}
               </div>
+
+              <div className="space-y-1.5">
+                <Label>Metode bayar</Label>
+                <Select
+                  value={paymentMethod}
+                  onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}
+                >
+                  <SelectTrigger className="w-full" aria-label="Metode bayar">
+                    <SelectValue placeholder="Pilih metode bayar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(PAYMENT_METHOD_LABELS) as PaymentMethod[]).map(
+                      (method) => (
+                        <SelectItem key={method} value={method}>
+                          {PAYMENT_METHOD_LABELS[method]}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {isCash && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="diterima">Uang diterima (Rp, opsional)</Label>
+                  <Input
+                    id="diterima"
+                    inputMode="numeric"
+                    placeholder="Contoh: 50000"
+                    value={amountPaidInput}
+                    onChange={(e) => {
+                      setAmountPaidInput(e.target.value.replace(/\D/g, ""));
+                      setError(null);
+                    }}
+                    aria-invalid={amountPaidInvalid || amountTooSmall}
+                  />
+                  {amountPaidInvalid && (
+                    <p className="text-destructive text-xs">
+                      Uang diterima harus angka bulat.
+                    </p>
+                  )}
+                  {amountTooSmall && (
+                    <p className="text-destructive text-xs">
+                      Uang diterima kurang dari total pesanan.
+                    </p>
+                  )}
+                  {change !== null && (
+                    <p className="text-sm">
+                      Kembalian:{" "}
+                      <span className="font-semibold tabular-nums">
+                        {formatRupiah(change)}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <Label htmlFor="catatan">Catatan (opsional)</Label>
@@ -473,6 +610,12 @@ export function OrderCreatePage() {
                       {formatRupiah(estimatedTotal)}
                     </dd>
                   </div>
+                  {change !== null && (
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">Kembalian</dt>
+                      <dd className="tabular-nums">{formatRupiah(change)}</dd>
+                    </div>
+                  )}
                 </dl>
                 <p className="text-muted-foreground mt-2 text-xs">
                   {lines.length} produk ·{" "}

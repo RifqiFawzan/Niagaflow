@@ -55,11 +55,21 @@ export type OrderItem = {
   lineTotal: number | string;
 };
 
+export type PaymentMethod = "TUNAI" | "QRIS" | "TRANSFER";
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  TUNAI: "Tunai",
+  QRIS: "QRIS",
+  TRANSFER: "Transfer",
+};
+
 export type Order = {
   id: string;
   orderNumber: string;
   customerId: string | null;
   status: OrderStatus;
+  paymentMethod: PaymentMethod | null;
+  amountPaid: number | null;
   subtotal: number | string;
   discount: number | string;
   total: number | string;

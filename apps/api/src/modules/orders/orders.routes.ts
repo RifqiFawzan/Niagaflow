@@ -26,6 +26,15 @@ const createOrderSchema = z.object({
     .number().int("Diskon harus bilangan bulat.")
     .min(0, "Diskon tidak boleh negatif.")
     .default(0),
+  paymentMethod: z
+    .enum(["TUNAI", "QRIS", "TRANSFER"], { message: "Metode bayar tidak dikenal." })
+    .nullable()
+    .optional(),
+  amountPaid: z
+    .number().int("Uang diterima harus bilangan bulat.")
+    .min(0, "Uang diterima tidak boleh negatif.")
+    .nullable()
+    .optional(),
   notes: z.string().trim().max(2000, "Catatan terlalu panjang.").nullable().optional(),
 });
 
@@ -50,7 +59,7 @@ router.post(
     if (!parsed.success) {
       throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0].message);
     }
-    const { customerId, items, discount, notes } = parsed.data;
+    const { customerId, items, discount, paymentMethod, amountPaid, notes } = parsed.data;
     const userId = req.user!.id;
 
     // Tolak duplikat produk (sederhana & eksplisit)
@@ -115,12 +124,19 @@ router.post(
         }
         const total = subtotal - discount;
 
+        // Uang diterima (mis. bayar tunai) harus menutup total; kembalian dihitung klien
+        if (amountPaid !== null && amountPaid !== undefined && amountPaid < total) {
+          throw new ApiError(400, "PAYMENT_INSUFFICIENT", "Uang diterima kurang dari total pesanan.");
+        }
+
         const order = await tx.order.create({
           data: {
             orderNumber: generateOrderNumber(),
             customerId: customerId ?? null,
             createdBy: userId,
             status: OrderStatus.pending,
+            paymentMethod: paymentMethod ?? null,
+            amountPaid: amountPaid ?? null,
             subtotal,
             discount,
             total,

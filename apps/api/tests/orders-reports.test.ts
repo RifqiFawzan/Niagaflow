@@ -57,6 +57,52 @@ describe("buat pesanan", () => {
     expect(res.body.data.total).toBe(65000);
   });
 
+  it("mencatat metode bayar dan uang diterima (number)", async () => {
+    const res = await agent()
+      .post("/api/v1/orders")
+      .set("Cookie", cookie)
+      .send({
+        items: [{ productId: fx.keripik.id, quantity: 2 }],
+        paymentMethod: "TUNAI",
+        amountPaid: 40000, // total 30.000 → kembalian 10.000
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.paymentMethod).toBe("TUNAI");
+    expect(res.body.data.amountPaid).toBe(40000);
+    expect(typeof res.body.data.amountPaid).toBe("number");
+
+    const stored = await prisma.order.findUnique({
+      where: { id: res.body.data.id },
+    });
+    expect(stored?.paymentMethod).toBe("TUNAI");
+    expect(Number(stored?.amountPaid)).toBe(40000);
+
+    // detail mengembalikan field yang sama
+    const detail = await agent()
+      .get(`/api/v1/orders/${res.body.data.id}`)
+      .set("Cookie", cookie);
+    expect(detail.body.data.paymentMethod).toBe("TUNAI");
+    expect(detail.body.data.amountPaid).toBe(40000);
+  });
+
+  it("menolak uang diterima yang kurang dari total (PAYMENT_INSUFFICIENT)", async () => {
+    const res = await agent()
+      .post("/api/v1/orders")
+      .set("Cookie", cookie)
+      .send({
+        items: [{ productId: fx.keripik.id, quantity: 2 }],
+        paymentMethod: "TUNAI",
+        amountPaid: 25000, // total 30.000
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("PAYMENT_INSUFFICIENT");
+
+    const count = await prisma.order.count();
+    expect(count).toBe(0); // transaksi dibatalkan penuh
+  });
+
   it("mencatat riwayat status awal (old_status null → pending)", async () => {
     const res = await agent()
       .post("/api/v1/orders")

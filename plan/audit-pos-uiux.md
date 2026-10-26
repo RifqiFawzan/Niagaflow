@@ -14,9 +14,11 @@ Aplikasi sudah rapi dan konsisten untuk alur **owner** (dashboard, produk, pesan
 Sebagian besar checklist §3 terpenuhi.
 
 Namun pedoman ini dirancang untuk **sistem POS dengan 4 peran dan halaman kasir**.
-Aplikasi sekarang hanya punya **2 peran (owner, staff)** dan **belum punya halaman POS/kasir**.
-Karena itu banyak poin pedoman yang bukan "perbaikan UI", melainkan **fitur yang belum ada**.
-Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
+Aplikasi sekarang hanya punya **2 peran (owner, staff)**; alur kasir (metode bayar, uang
+diterima, kembalian) baru ditambahkan di ISSUE-018 lewat `/orders/new`.
+Karena itu sebagian poin pedoman yang tersisa bukan "perbaikan UI", melainkan **fitur yang
+belum ada** (riwayat stok, peran 4 jenis, tema). Perbedaan ini sengaja dicatat, bukan
+ditutupi (lihat §4).
 
 ---
 
@@ -47,16 +49,23 @@ Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
 ### P0 — menghalangi transaksi (belum ada fitur)
 
 1. **Belum ada halaman POS/kasir.** Pedoman §4, §5.2, §10.6–§10.9, §11 mendeskripsikan
-   kasir 2 panel (kiri cari produk + keranjang, kanan ringkasan tetap). Aplikasi sekarang
-   membuat pesanan lewat `/orders/new` berupa form penuh, bukan alur kasir cepat.
-   *Ini fitur baru, bukan polesan.*
+   kasir 2 panel (kiri cari produk + keranjang, kanan ringkasan tetap).
+   **Selesai: ISSUE-018** — koreksi fakta: `/orders/new` ternyata sudah berstruktur 2 panel
+   sesuai §8 (kiri: cari produk + keranjang; kanan: ringkasan + tombol bayar), jadi tidak
+   perlu halaman POS terpisah. ISSUE-018 menambahkan langkah pembayaran (metode bayar,
+   uang diterima, kembalian) di panel kanan.
 
 2. **Metode pembayaran belum dicatat.** Tidak ada kolom `paymentMethod` (tunai/QRIS/card)
    di model pesanan. Pedoman §4, §8.2, §9, §10.3, §10.4, §17.2 mensyaratkannya.
-   *Perlu ubah skema DB + backend + frontend.*
+   **Selesai: ISSUE-018** — kolom `paymentMethod` (TUNAI/QRIS/TRANSFER) + `amountPaid`
+   ditambahkan via migrasi DB; input di halaman buat pesanan; tampil di detail pesanan.
 
 3. **Diskon produk & input kasir belum ada.** Pedoman §4.2, §10.10–§10.12 (diskon produk /
-   total, nominal / persen, input angka +/−). Sekarang hanya ada diskon total sederhana.
+   total, nominal / persen, input angka +/−).
+   **Selesai sebagian (ISSUE-018):** diskon total kini bisa nominal (Rp) atau persen (%)
+   dengan input angka, plus metode bayar + uang diterima/kembalian (§10.10–§10.12).
+   *Belum:* diskon per item / harga coret produk — butuh kolom diskon di produk &
+   OrderItem; keputusan lingkup, belum dikerjakan.
 
 ### P1 — owner sulit ambil keputusan / data belum lengkap
 
@@ -83,7 +92,8 @@ Perbedaan ini sengaja dicatat, bukan ditutupi (lihat §4).
 
 ### P2 — efisiensi / polesan kecil
 
-9. **Detail pesanan belum tampilkan metode bayar** (§8.2) — ikut terblokir no. 2.
+9. **Detail pesanan belum tampilkan metode bayar** (§8.2).
+   **Selesai: ISSUE-018** — kartu "Pembayaran" di detail: metode, uang diterima, kembalian.
 10. **Pencarian global belum ada** (§10.6, audit P1).
 11. **Label stok**: pedoman §9 minta status "Aman"/"Menipis"/"Habis"; aplikasi memakai
     "Aktif"/"Stok menipis" tanpa beda untuk stok 0. **Selesai: ISSUE-017** — kini "Aman",

@@ -102,6 +102,14 @@ export const orderSchema = registry.register(
     orderNumber: z.string().openapi({ example: "ORD-20261020-8EX54X" }),
     status: z.enum(["pending", "processing", "completed", "cancelled"]),
     customerId: z.string().uuid().nullable(),
+    paymentMethod: z
+      .enum(["TUNAI", "QRIS", "TRANSFER"])
+      .nullable()
+      .openapi({ description: "Kosong untuk pesanan lama yang dibuat sebelum kolom ini ada." }),
+    amountPaid: z
+      .number().int()
+      .nullable()
+      .openapi({ description: "Uang diterima (Rp); kembalian = amountPaid − total. Hanya relevan untuk tunai." }),
     subtotal: z.number().int(),
     discount: z.number().int(),
     total: z.number().int(),
@@ -189,6 +197,16 @@ export const orderInput = registry.register(
       )
       .min(1),
     discount: z.number().int().min(0).default(0),
+    paymentMethod: z
+      .enum(["TUNAI", "QRIS", "TRANSFER"])
+      .nullable()
+      .optional()
+      .openapi({ description: "Opsional demi kompatibilitas; UI selalu mengirim nilai." }),
+    amountPaid: z
+      .number().int().min(0)
+      .nullable()
+      .optional()
+      .openapi({ description: "Wajib menutup total bila diisi; server menolak dengan `PAYMENT_INSUFFICIENT`." }),
     notes: z.string().max(2000).nullable().optional(),
   })
 );
