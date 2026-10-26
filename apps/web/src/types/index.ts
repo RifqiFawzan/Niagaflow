@@ -118,3 +118,9 @@ export type SalesTrend = {
   to: string;
   points: SalesTrendPoint[];
 };
+
+export type SalesByCategory = {
+  from: string;
+  to: string;
+  categories: Array<{ name: string; revenue: number | string; quantity: number }>;
+};

@@ -362,6 +362,34 @@ describe("laporan", () => {
     expect(rows[0].quantitySold).toBe(20);
   });
 
+  it("sales-by-category mengelompokkan pendapatan per kategori (hanya completed)", async () => {
+    // keripik (Makanan, 15k) ×2 = 30k; teh (Minuman, 5k) ×3 = 15k
+    await seedOrder({ productId: fx.keripik.id, quantity: 2, complete: true });
+    await seedOrder({ productId: fx.teh.id, quantity: 3, complete: true });
+    // kue (Makanan) pending → tidak dihitung
+    await seedOrder({ productId: fx.kue.id, quantity: 1 });
+
+    const res = await agent().get("/api/v1/reports/sales-by-category").set("Cookie", cookie);
+    expect(res.status).toBe(200);
+
+    const cats = res.body.data.categories as Array<{ name: string; revenue: number; quantity: number }>;
+    expect(cats.map((c) => c.name)).toEqual(["Makanan", "Minuman"]); // urut revenue desc
+    expect(cats[0]).toMatchObject({ name: "Makanan", revenue: 30000, quantity: 2 });
+    expect(cats[1]).toMatchObject({ name: "Minuman", revenue: 15000, quantity: 3 });
+  });
+
+  it("sales-by-category: tanpa kategori dikelompokkan sebagai 'Tanpa kategori'", async () => {
+    await prisma.product.update({ where: { id: fx.teh.id }, data: { categoryId: null } });
+    await seedOrder({ productId: fx.teh.id, quantity: 2, complete: true }); // 10k
+
+    const res = await agent().get("/api/v1/reports/sales-by-category").set("Cookie", cookie);
+    expect(res.status).toBe(200);
+
+    const cats = res.body.data.categories as Array<{ name: string; revenue: number }>;
+    expect(cats).toHaveLength(1);
+    expect(cats[0]).toMatchObject({ name: "Tanpa kategori", revenue: 10000 });
+  });
+
   it("low-stock mengembalikan produk di bawah/tepat ambang batas", async () => {
     await prisma.product.update({ where: { id: fx.keripik.id }, data: { stock: 0 } });
 
@@ -418,7 +446,7 @@ describe("laporan", () => {
   });
 
   it("semua endpoint laporan → 401 tanpa sesi", async () => {
-    for (const path of ["dashboard", "summary", "top-products", "low-stock"]) {
+    for (const path of ["dashboard", "summary", "top-products", "sales-by-category", "low-stock"]) {
       const res = await agent().get(`/api/v1/reports/${path}`);
       expect(res.status, path).toBe(401);
     }

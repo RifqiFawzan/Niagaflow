@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Area,
@@ -16,35 +15,21 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
+import { RANGES, shortLabel, type RangeDays } from "./period";
 import type { SalesTrend } from "@/types";
 
-const RANGES = [
-  { days: 7, label: "7 hari" },
-  { days: 30, label: "30 hari" },
-] as const;
+type Props = {
+  days: RangeDays;
+  onDaysChange: (days: RangeDays) => void;
+  from: string;
+  to: string;
+};
 
-type RangeDays = (typeof RANGES)[number]["days"];
-
-/** "2026-10-18" -> "18 Okt" (sumbu-x ringkas). */
-function shortLabel(dateStr: string) {
-  const d = new Date(`${dateStr}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
-}
-
-function toIso(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-export function SalesTrendChart() {
-  const [days, setDays] = useState<RangeDays>(30);
-
-  const to = new Date();
-  const from = new Date(to.getTime() - (days - 1) * 86_400_000);
-  const query = new URLSearchParams({ from: toIso(from), to: toIso(to) });
+export function SalesTrendChart({ days, onDaysChange, from, to }: Props) {
+  const query = new URLSearchParams({ from, to });
 
   const { data, isPending, isError, error, refetch } = useQuery({
-    queryKey: ["reports", "sales-trend", days],
+    queryKey: ["reports", "sales-trend", from, to],
     queryFn: () => api<SalesTrend>(`/reports/sales-trend?${query.toString()}`),
   });
 
@@ -65,7 +50,7 @@ export function SalesTrendChart() {
             <button
               key={r.days}
               type="button"
-              onClick={() => setDays(r.days)}
+              onClick={() => onDaysChange(r.days)}
               className={cn(
                 "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
                 days === r.days

@@ -215,6 +215,48 @@ router.get(
   })
 );
 
+// Penjualan per kategori (owner) — dipakai grafik donat.
+// Hanya pesanan `completed`, sama seperti laporan lain supaya angka konsisten.
+router.get(
+  "/sales-by-category",
+  requireRole("owner"),
+  asyncHandler(async (req, res) => {
+    const parsed = rangeSchema.safeParse(req.query);
+    if (!parsed.success) {
+      throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0].message);
+    }
+    const { start, end } = resolveRange(parsed.data.from, parsed.data.to);
+
+    // Kategori tidak bisa di-groupBy langsung (butuh join ke product), jadi ambil
+    // item + nama kategorinya lalu rangkum di JS.
+    const items = await prisma.orderItem.findMany({
+      where: {
+        order: { status: OrderStatus.completed, createdAt: { gte: start, lte: end } },
+      },
+      select: {
+        quantity: true,
+        lineTotal: true,
+        product: { select: { category: { select: { name: true } } } },
+      },
+    });
+
+    const byCategory = new Map<string, { revenue: number; quantity: number }>();
+    for (const item of items) {
+      const name = item.product?.category?.name ?? "Tanpa kategori";
+      const bucket = byCategory.get(name) ?? { revenue: 0, quantity: 0 };
+      bucket.revenue += Number(item.lineTotal ?? 0);
+      bucket.quantity += item.quantity;
+      byCategory.set(name, bucket);
+    }
+
+    const categories = [...byCategory.entries()]
+      .map(([name, v]) => ({ name, revenue: money(v.revenue), quantity: v.quantity }))
+      .sort((a, b) => Number(b.revenue) - Number(a.revenue));
+
+    res.json({ success: true, data: { from: start, to: end, categories } });
+  })
+);
+
 // Produk stok menipis (semua role login — operasional)
 router.get(
   "/low-stock",

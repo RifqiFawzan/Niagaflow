@@ -23,8 +23,19 @@ Alur kerja: `workflow.md` — backlog → issues → kit → run loop (per issue
 - [x] ISSUE-013 — Test integration alur inti (Vitest + Supertest) — Minggu 7 ✅ 20 Okt 2026
 - [x] ISSUE-014 — Keamanan (rate limit login, CORS ketat) + OpenAPI + deployment — Minggu 7 ✅ 20 Okt 2026
 - [x] ISSUE-015 — Grafik tren penjualan di dashboard (Recharts) — 26 Okt 2026
+- [x] ISSUE-016 — Grafik produk terlaris + penjualan per kategori, satu periode (Tahap A) — 26 Okt 2026
 
 Sisa pekerjaan ISSUE-014: **demo online** belum dijalankan (butuh akun hosting pemilik). Semua berkas siap di `docs/DEPLOY.md` dan `.env.production.example`.
+
+## Audit UI/UX POS (26 Okt 2026)
+
+Sumber: `plan/POS_UI_UX_Guideline.md`. Laporan lengkap: `plan/audit-pos-uiux.md`.
+Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekatan (Anda)** → backlog issue → loop.
+
+- Tahap A (aman, tanpa ubah skema DB): grafik kategori, grafik batang produk terlaris, samakan periode KPI, label stok, urut tabel.
+  - [x] Grafik kategori + batang produk terlaris + satu periode bersama — **ISSUE-016** ✅ 26 Okt 2026
+  - [ ] Label stok "Stok Rendah (sisa X)" (§7.2) + pengurutan kolom tabel produk — menunggu issue berikutnya
+- Tahap B (butuh keputusan, sentuh skema/lingkup): halaman POS/kasir, metode bayar, diskon produk, riwayat stok, peran 4 jenis, ganti tema.
 
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
@@ -24,12 +25,17 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { SalesTrendChart } from "./SalesTrendChart";
+import { TopProductsChart } from "./TopProductsChart";
+import { CategoryDonutChart } from "./CategoryDonutChart";
+import { buildRange, type RangeDays } from "./period";
 import type { DashboardData } from "@/types";
 
 const CARD_ICONS = [Package, ReceiptText, Wallet, AlertTriangle];
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const [days, setDays] = useState<RangeDays>(30);
+  const { from, to } = buildRange(days);
   const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: ["reports", "dashboard"],
     queryFn: () => api<DashboardData>("/reports/dashboard"),
@@ -103,7 +109,21 @@ export function DashboardPage() {
         })}
       </div>
 
-      {user?.role === "owner" && <SalesTrendChart />}
+      {user?.role === "owner" && (
+        <SalesTrendChart
+          days={days}
+          onDaysChange={setDays}
+          from={from}
+          to={to}
+        />
+      )}
+
+      {user?.role === "owner" && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <TopProductsChart from={from} to={to} />
+          <CategoryDonutChart from={from} to={to} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card>

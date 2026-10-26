@@ -519,6 +519,35 @@ registry.registerPath({
 
 registry.registerPath({
   method: "get",
+  path: `${BASE}/reports/sales-by-category`,
+  tags: ["Laporan"],
+  summary: "Penjualan per kategori (owner)",
+  description:
+    "Pendapatan dan jumlah terjual per kategori produk pada rentang tanggal. Hanya menghitung pesanan berstatus `completed`. Produk tanpa kategori masuk ke `Tanpa kategori`. Waktu memakai zona waktu lokal server.",
+  request: { query: rangeQuery },
+  responses: {
+    200: jsonResponse(
+      "Penjualan per kategori.",
+      okSchema(
+        z.object({
+          from: z.string().optional(),
+          to: z.string().optional(),
+          categories: z.array(
+            z.object({
+              name: z.string().openapi({ example: "Makanan" }),
+              revenue: z.number().int(),
+              quantity: z.number().int(),
+            })
+          ),
+        })
+      )
+    ),
+    ...securedResponses,
+  },
+});
+
+registry.registerPath({
+  method: "get",
   path: `${BASE}/reports/low-stock`,
   tags: ["Laporan"],
   summary: "Produk yang stoknya menipis (semua user login)",
