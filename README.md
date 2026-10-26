@@ -10,9 +10,7 @@ Sistem manajemen pesanan, stok, dan penjualan untuk UMKM. Aplikasi web fullstack
 
 ## Screenshot
 
-Belum ada gambar di repo ini. Halaman yang perlu diambil: dashboard, produk, pesanan, laporan.
-
-Cara mengambilnya: jalankan aplikasi (`npm run dev:api` dan `npm run dev:web`), masuk, lalu simpan gambar ke `docs/screenshots/` dengan nama persis ini.
+Halaman utama NiagaFlow: dashboard, produk, pesanan, dan laporan.
 
 | Berkas | Halaman |
 |---|---|
@@ -20,8 +18,6 @@ Cara mengambilnya: jalankan aplikasi (`npm run dev:api` dan `npm run dev:web`), 
 | `docs/screenshots/produk.png` | `/products` |
 | `docs/screenshots/pesanan.png` | `/orders` |
 | `docs/screenshots/laporan.png` | `/reports` |
-
-Setelah gambarnya ada, baris di bawah ini otomatis menampilkannya:
 
 | Dashboard | Produk |
 |---|---|
