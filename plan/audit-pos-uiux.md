@@ -106,6 +106,8 @@ ditutupi (lihat §4).
     **Selesai: ISSUE-017** — nama/harga/stok kini tersedia dua arah.
 13. **Desain sistem beda dari pedoman**: primer `#2563EB` biru + font Inter (§10.1–§10.2);
     aplikasi memakai primer slate gelap + font bawaan. Bisa diubah, tapi ini seluruh tema.
+    **Selesai: ISSUE-021** — primer kini `#2563EB` (token ring & sidebar ikut) dan font
+    Inter self-hosted via `@fontsource-variable/inter`; screenshot README diambil ulang.
 
 ### P3 — rendah / opsional
 
@@ -139,8 +141,8 @@ Kerjakan bertahap, mulai dari yang aman dan bernilai:
   **Selesai — ISSUE-016 (grafik + periode) dan ISSUE-017 (label stok + urut).**
 - **Tahap B (butuh keputusan Anda):** no. 1–3 (halaman POS + metode bayar + diskon),
   no. 6 (riwayat stok), no. 8 (peran), no. 13 (ganti tema).
-  **Sebagian selesai — ISSUE-018 (no. 1–3), ISSUE-019 (no. 6), ISSUE-020 (no. 8);
-  sisa no. 13 (ISSUE-021).**
+  **Selesai — ISSUE-018 (no. 1–3), ISSUE-019 (no. 6), ISSUE-020 (no. 8), ISSUE-021
+  (no. 13). Seluruh paket Tahap B lengkap.**
 
 Setelah Anda pilih tahap/lingkup, tiap item dipecah jadi issue (backlog → loop),
 lalu dikerjakan satu per satu.

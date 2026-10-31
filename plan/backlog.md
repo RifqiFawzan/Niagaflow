@@ -39,7 +39,7 @@ Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekat
   - [x] ISSUE-018 — POS: metode bayar (Tunai/QRIS/Transfer) + uang diterima/kembalian + diskon Rp/% (P0, audit no. 1–3) ✅ 26 Okt 2026
   - [x] ISSUE-019 — Riwayat pergerakan stok: tabel StockMovement + form Stok masuk/keluar + halaman riwayat (P1, audit no. 6)
   - [x] ISSUE-020 — Peran 4 jenis (owner, kasir, pengelola stok, admin) + halaman kelola pengguna (P1, audit no. 8 + no. 16)
-  - [ ] ISSUE-021 — Ganti tema primer #2563EB + font Inter (P2, audit no. 13; screenshot README ikut diulang)
+  - [x] ISSUE-021 — Ganti tema primer #2563EB + font Inter (P2, audit no. 13; screenshot README ikut diulang)
 
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 
