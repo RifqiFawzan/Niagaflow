@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Pencil, Plus, Search } from "lucide-react";
+import { ArrowDownUp, History, Pencil, Plus, Search } from "lucide-react";
 
 import { api, errorMessage } from "@/lib/api";
 import { formatRupiah } from "@/lib/format";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { StockAdjustDialog } from "@/features/products/StockAdjustDialog";
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,7 @@ export function ProductListPage() {
   const [includeArchived, setIncludeArchived] = useState(false);
   const [page, setPage] = useState(1);
   const [target, setTarget] = useState<Product | null>(null);
+  const [adjust, setAdjust] = useState<Product | null>(null);
 
   const debouncedSearch = useDebouncedValue(search, 300);
   const [sortField, sortOrder] = sort.split(":");
@@ -94,6 +96,12 @@ export function ProductListPage() {
         title="Produk"
         description="Kelola katalog produk, harga, dan stok."
       >
+        <Button asChild variant="outline">
+          <Link to="/stock-movements">
+            <History />
+            Riwayat stok
+          </Link>
+        </Button>
         {isOwner && (
           <Button asChild>
             <Link to="/products/new">
@@ -289,6 +297,14 @@ export function ProductListPage() {
                         {isOwner && (
                           <TableCell className="pr-4 text-right">
                             <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setAdjust(product)}
+                              >
+                                <ArrowDownUp />
+                                Atur stok
+                              </Button>
                               <Button asChild variant="ghost" size="sm">
                                 <Link to={`/products/${product.id}/edit`}>
                                   <Pencil />
@@ -334,6 +350,12 @@ export function ProductListPage() {
         busy={archive.isPending}
         onConfirm={() => target && archive.mutate(target)}
         onCancel={() => setTarget(null)}
+      />
+
+      <StockAdjustDialog
+        product={adjust}
+        open={adjust !== null}
+        onOpenChange={(next) => !next && setAdjust(null)}
       />
     </div>
   );

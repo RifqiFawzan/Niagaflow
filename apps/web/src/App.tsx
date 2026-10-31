@@ -5,6 +5,7 @@ import { ProtectedRoute, RoleGuard } from "./routes/guards";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { ProductListPage } from "./features/products/ProductListPage";
 import { ProductFormPage } from "./features/products/ProductFormPage";
+import { StockMovementListPage } from "./features/stock/StockMovementListPage";
 import { CategoriesPage } from "./features/categories/CategoriesPage";
 import { CustomerListPage } from "./features/customers/CustomerListPage";
 import { CustomerDetailPage } from "./features/customers/CustomerDetailPage";
@@ -44,6 +45,7 @@ export default function App() {
             </RoleGuard>
           }
         />
+        <Route path="/stock-movements" element={<StockMovementListPage />} />
 
         <Route
           path="/categories"

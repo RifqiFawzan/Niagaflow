@@ -21,6 +21,7 @@ export async function resetFixtures() {
   resetRateLimit();
 
   // Urutan hapus menghormati foreign key.
+  await prisma.stockMovement.deleteMany();
   await prisma.orderStatusHistory.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();

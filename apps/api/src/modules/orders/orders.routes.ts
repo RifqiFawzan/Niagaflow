@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { Prisma, OrderStatus } from "@prisma/client";
+import { Prisma, OrderStatus, StockMovementType } from "@prisma/client";
 import { requireAuth } from "../../middleware/auth.middleware";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { ApiError } from "../../utils/ApiError";
@@ -155,6 +155,17 @@ router.post(
           },
         });
 
+        // Riwayat stok (§15.5–§15.6): tiap item pesanan mengurangi stok
+        await tx.stockMovement.createMany({
+          data: itemsData.map((item) => ({
+            productId: item.productId,
+            delta: -item.quantity,
+            type: StockMovementType.PENJUALAN,
+            orderId: order.id,
+            createdBy: userId,
+          })),
+        });
+
         return order;
       });
 
@@ -247,6 +258,16 @@ router.patch(
             data: { stock: { increment: item.quantity } },
           });
         }
+        // Riwayat stok: pengembalian stok karena pembatalan
+        await tx.stockMovement.createMany({
+          data: order.items.map((item) => ({
+            productId: item.productId,
+            delta: item.quantity,
+            type: StockMovementType.PEMBATALAN,
+            orderId: order.id,
+            createdBy: userId,
+          })),
+        });
       }
 
       await tx.orderStatusHistory.create({

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { Prisma, StockMovementType } from "@prisma/client";
 import { requireAuth, requireRole } from "../../middleware/auth.middleware";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { prisma } from "../../utils/prisma";
@@ -133,16 +133,31 @@ router.post(
       }
     }
     try {
-      const product = await prisma.product.create({
-        data: {
-          name: data.name,
-          sku: data.sku.toUpperCase(),
-          categoryId: data.categoryId ?? null,
-          description: data.description ?? null,
-          price: data.price,
-          stock: data.stock,
-          lowStockThreshold: data.lowStockThreshold,
-        },
+      const product = await prisma.$transaction(async (tx) => {
+        const created = await tx.product.create({
+          data: {
+            name: data.name,
+            sku: data.sku.toUpperCase(),
+            categoryId: data.categoryId ?? null,
+            description: data.description ?? null,
+            price: data.price,
+            stock: data.stock,
+            lowStockThreshold: data.lowStockThreshold,
+          },
+        });
+        // Stok awal ikut tercatat agar riwayat menjelaskan angka stok sejak awal
+        if (data.stock > 0) {
+          await tx.stockMovement.create({
+            data: {
+              productId: created.id,
+              delta: data.stock,
+              type: StockMovementType.MASUK,
+              reason: "Stok awal produk baru",
+              createdBy: req.user!.id,
+            },
+          });
+        }
+        return created;
       });
       res.status(201).json({ success: true, data: serializeProduct(product) });
     } catch (error) {
@@ -182,17 +197,33 @@ router.patch(
       }
     }
     try {
-      const product = await prisma.product.update({
-        where: { id: existing.id },
-        data: {
-          ...(data.name !== undefined ? { name: data.name } : {}),
-          ...(data.sku !== undefined ? { sku: data.sku.toUpperCase() } : {}),
-          ...(data.categoryId !== undefined ? { categoryId: data.categoryId } : {}),
-          ...(data.description !== undefined ? { description: data.description } : {}),
-          ...(data.price !== undefined ? { price: data.price } : {}),
-          ...(data.stock !== undefined ? { stock: data.stock } : {}),
-          ...(data.lowStockThreshold !== undefined ? { lowStockThreshold: data.lowStockThreshold } : {}),
-        },
+      const product = await prisma.$transaction(async (tx) => {
+        const updated = await tx.product.update({
+          where: { id: existing.id },
+          data: {
+            ...(data.name !== undefined ? { name: data.name } : {}),
+            ...(data.sku !== undefined ? { sku: data.sku.toUpperCase() } : {}),
+            ...(data.categoryId !== undefined ? { categoryId: data.categoryId } : {}),
+            ...(data.description !== undefined ? { description: data.description } : {}),
+            ...(data.price !== undefined ? { price: data.price } : {}),
+            ...(data.stock !== undefined ? { stock: data.stock } : {}),
+            ...(data.lowStockThreshold !== undefined ? { lowStockThreshold: data.lowStockThreshold } : {}),
+          },
+        });
+        // Stok ikut berubah lewat ubah produk → catat ke riwayat mutasi (§15.5)
+        const stockDelta = data.stock !== undefined ? data.stock - existing.stock : 0;
+        if (stockDelta !== 0) {
+          await tx.stockMovement.create({
+            data: {
+              productId: existing.id,
+              delta: stockDelta,
+              type: stockDelta > 0 ? StockMovementType.MASUK : StockMovementType.KELUAR,
+              reason: "Penyesuaian lewat ubah produk",
+              createdBy: req.user!.id,
+            },
+          });
+        }
+        return updated;
       });
       res.json({ success: true, data: serializeProduct(product) });
     } catch (error) {

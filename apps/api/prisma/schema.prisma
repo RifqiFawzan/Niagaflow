@@ -25,6 +25,13 @@ enum PaymentMethod {
   TRANSFER
 }
 
+enum StockMovementType {
+  MASUK
+  KELUAR
+  PENJUALAN
+  PEMBATALAN
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -36,6 +43,7 @@ model User {
 
   orders        Order[]              @relation("OrderCreatedBy")
   statusHistory OrderStatusHistory[]
+  stockMovements StockMovement[]
 
   @@map("users")
 }
@@ -65,6 +73,7 @@ model Product {
 
   category  Category?  @relation(fields: [categoryId], references: [id])
   orderItems OrderItem[]
+  stockMovements StockMovement[]
 
   @@map("products")
 }
@@ -100,6 +109,7 @@ model Order {
   creator       User                @relation("OrderCreatedBy", fields: [createdBy], references: [id])
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
+  stockMovements StockMovement[]
 
   @@map("orders")
 }
@@ -131,4 +141,26 @@ model OrderStatusHistory {
   changer User  @relation(fields: [changedBy], references: [id])
 
   @@map("order_status_history")
+}
+
+/// Riwayat pergerakan stok (pedoman §15.5–§15.6, §9).
+/// `delta` bertanda: positif = stok bertambah, negatif = stok berkurang.
+/// Pesanan membuat baris PENJUALAN / PEMBATALAN otomatis; masuk/keluar manual
+/// dan penyesuaian lewat ubah produk mencatat `reason`.
+model StockMovement {
+  id        String            @id @default(uuid())
+  productId String            @map("product_id")
+  delta     Int
+  type      StockMovementType
+  reason    String?
+  orderId   String?           @map("order_id")
+  createdBy String            @map("created_by")
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  user    User    @relation(fields: [createdBy], references: [id])
+
+  @@index([productId, createdAt(sort: Desc)])
+  @@map("stock_movements")
 }

@@ -9,6 +9,8 @@ import {
   productInput,
   productSchema,
   productUpdateInput,
+  stockMovementInput,
+  stockMovementSchema,
   categoryInput,
   categorySchema,
   customerInput,
@@ -407,6 +409,59 @@ registry.registerPath({
     200: jsonResponse("Status diubah.", okSchema(orderSchema)),
     400: errorResponse("Perubahan status tidak diizinkan (`INVALID_TRANSITION`)."),
     404: errorResponse("Pesanan tidak ditemukan."),
+    ...securedResponses,
+  },
+});
+
+/* ------------------------------------------------------------------ *
+ * Riwayat stok
+ * ------------------------------------------------------------------ */
+
+registry.registerPath({
+  method: "get",
+  path: `${BASE}/stock-movements`,
+  tags: ["Riwayat stok"],
+  summary: "Daftar pergerakan stok (semua peran)",
+  description:
+    "Termasuk gerakan otomatis: `PENJUALAN` saat pesanan dibuat dan `PEMBATALAN` " +
+    "saat dibatalkan. Urutan terbaru di atas.",
+  request: {
+    query: z.object({
+      productId: z.string().uuid().optional(),
+      type: z.enum(["MASUK", "KELUAR", "PENJUALAN", "PEMBATALAN"]).optional(),
+      page: z.coerce.number().int().min(1).optional(),
+      pageSize: z.coerce.number().int().min(1).max(100).optional(),
+    }),
+  },
+  responses: {
+    200: jsonResponse(
+      "Daftar pergerakan stok.",
+      okSchema(
+        z.object({
+          items: z.array(stockMovementSchema),
+          page: z.number().int(),
+          pageSize: z.number().int(),
+          total: z.number().int(),
+          totalPages: z.number().int(),
+        })
+      )
+    ),
+    400: errorResponse("Parameter query tidak valid."),
+    ...securedResponses,
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: `${BASE}/stock-movements`,
+  tags: ["Riwayat stok"],
+  summary: "Catat stok masuk/keluar manual (owner)",
+  description: "Alasan wajib. Stok tidak boleh menjadi negatif (`INSUFFICIENT_STOCK`).",
+  request: { body: { content: { "application/json": { schema: stockMovementInput } } } },
+  responses: {
+    201: jsonResponse("Pergerakan tercatat.", okSchema(stockMovementSchema)),
+    400: errorResponse("Data tidak valid atau stok kurang (`INSUFFICIENT_STOCK`)."),
+    404: errorResponse("Produk tidak ditemukan."),
     ...securedResponses,
   },
 });

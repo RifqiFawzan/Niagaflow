@@ -140,6 +140,29 @@ export const paginatedProductsSchema = registry.register(
   })
 );
 
+export const stockMovementSchema = registry.register(
+  "StockMovement",
+  z.object({
+    id: z.string().uuid(),
+    productId: z.string().uuid(),
+    delta: z
+      .number().int()
+      .openapi({ description: "Bertanda: positif = stok bertambah, negatif = stok berkurang." }),
+    type: z.enum(["MASUK", "KELUAR", "PENJUALAN", "PEMBATALAN"]),
+    reason: z
+      .string().nullable()
+      .openapi({ description: "Alasan manual; null untuk gerakan otomatis dari pesanan." }),
+    orderId: z.string().uuid().nullable(),
+    createdAt: z.string().datetime().optional(),
+    product: z.object({ id: z.string().uuid(), name: z.string(), sku: z.string() }).optional(),
+    user: z.object({ id: z.string().uuid(), name: z.string() }).optional(),
+    order: z
+      .object({ id: z.string().uuid(), orderNumber: z.string() })
+      .nullable()
+      .optional(),
+  })
+);
+
 /* ------------------------------------------------------------------ *
  * Input (request body / query)
  * ------------------------------------------------------------------ */
@@ -215,6 +238,16 @@ export const statusInput = registry.register(
   "OrderStatusInput",
   z.object({
     status: z.enum(["pending", "processing", "completed", "cancelled"]),
+  })
+);
+
+export const stockMovementInput = registry.register(
+  "StockMovementInput",
+  z.object({
+    productId: z.string().uuid(),
+    type: z.enum(["MASUK", "KELUAR"]),
+    quantity: z.number().int().min(1),
+    reason: z.string().min(1).max(500),
   })
 );
 

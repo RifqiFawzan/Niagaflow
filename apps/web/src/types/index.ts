@@ -134,3 +134,29 @@ export type SalesByCategory = {
   to: string;
   categories: Array<{ name: string; revenue: number | string; quantity: number }>;
 };
+
+export type StockMovementType =
+  | "MASUK"
+  | "KELUAR"
+  | "PENJUALAN"
+  | "PEMBATALAN";
+
+export const STOCK_MOVEMENT_LABELS: Record<StockMovementType, string> = {
+  MASUK: "Masuk",
+  KELUAR: "Keluar",
+  PENJUALAN: "Penjualan",
+  PEMBATALAN: "Pembatalan",
+};
+
+export type StockMovement = {
+  id: string;
+  productId: string;
+  delta: number; // positif = bertambah, negatif = berkurang
+  type: StockMovementType;
+  reason: string | null;
+  orderId: string | null;
+  createdAt: string;
+  product?: { id: string; name: string; sku: string } | null;
+  user?: { id: string; name: string } | null;
+  order?: { id: string; orderNumber: string } | null;
+};

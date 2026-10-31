@@ -78,6 +78,7 @@ ditutupi (lihat §4).
 
 6. **Riwayat pergerakan stok belum ada** (§15.5, §15.6, audit P1). Tabel stok hanya berubah
    saat pesanan dibuat/dibatalkan. Belum ada form "Stok masuk" / "Stok keluar" + riwayat.
+   **Selesai: ISSUE-019.**
 
 7. **Kartu KPI dashboard belum satu periode** (§6.3). KPI memakai "hari ini" + "semua waktu",
    sedangkan grafik memakai 7/30 hari. Pedoman minta satu filter periode untuk semua.
@@ -134,6 +135,8 @@ Kerjakan bertahap, mulai dari yang aman dan bernilai:
   **Selesai — ISSUE-016 (grafik + periode) dan ISSUE-017 (label stok + urut).**
 - **Tahap B (butuh keputusan Anda):** no. 1–3 (halaman POS + metode bayar + diskon),
   no. 6 (riwayat stok), no. 8 (peran), no. 13 (ganti tema).
+  **Sebagian selesai — ISSUE-018 (no. 1–3) dan ISSUE-019 (no. 6); sisa no. 8 (ISSUE-020)
+  dan no. 13 (ISSUE-021).**
 
 Setelah Anda pilih tahap/lingkup, tiap item dipecah jadi issue (backlog → loop),
 lalu dikerjakan satu per satu.
