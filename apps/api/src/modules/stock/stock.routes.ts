@@ -31,7 +31,7 @@ const createMovementSchema = z.object({
 
 router.post(
   "/",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const parsed = createMovementSchema.safeParse(req.body);
     if (!parsed.success) {

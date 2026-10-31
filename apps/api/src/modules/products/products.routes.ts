@@ -113,7 +113,7 @@ function mapUniqueViolation(res: import("express").Response, error: unknown): bo
 
 router.post(
   "/",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const parsed = productSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -169,7 +169,7 @@ router.post(
 
 router.patch(
   "/:id",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const parsed = productSchema.partial().safeParse(req.body);
     if (!parsed.success) {
@@ -235,7 +235,7 @@ router.patch(
 
 router.patch(
   "/:id/archive",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const id = parseUuid(req.params.id);
     const existing = await prisma.product.findUnique({ where: { id } });

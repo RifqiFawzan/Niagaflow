@@ -35,7 +35,7 @@ router.get(
 
 router.post(
   "/",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const parsed = categorySchema.safeParse(req.body);
     if (!parsed.success) {
@@ -51,7 +51,7 @@ router.post(
 
 router.patch(
   "/:id",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const parsed = categorySchema.safeParse(req.body);
     if (!parsed.success) {
@@ -78,7 +78,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  requireRole("owner"),
+  requireRole("owner", "stock_manager"),
   asyncHandler(async (req, res) => {
     const id = parseUuid(req.params.id);
     const existing = await prisma.category.findUnique({

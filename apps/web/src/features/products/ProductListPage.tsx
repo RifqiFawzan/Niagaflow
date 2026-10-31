@@ -41,7 +41,8 @@ const ALL = "all";
 
 export function ProductListPage() {
   const { user } = useAuth();
-  const isOwner = user?.role === "owner";
+  const canManage =
+    user?.role === "owner" || user?.role === "stock_manager";
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState("");
@@ -102,7 +103,7 @@ export function ProductListPage() {
             Riwayat stok
           </Link>
         </Button>
-        {isOwner && (
+        {canManage && (
           <Button asChild>
             <Link to="/products/new">
               <Plus />
@@ -211,7 +212,7 @@ export function ProductListPage() {
           title="Tidak ada produk"
           description="Coba ubah kata kunci atau filter, atau tambah produk baru."
           action={
-            isOwner ? (
+            canManage ? (
               <Button asChild size="sm">
                 <Link to="/products/new">
                   <Plus />
@@ -234,7 +235,7 @@ export function ProductListPage() {
                     <TableHead className="text-right">Harga</TableHead>
                     <TableHead className="text-right">Stok</TableHead>
                     <TableHead>Status</TableHead>
-                    {isOwner && (
+                    {canManage && (
                       <TableHead className="pr-4 text-right">Aksi</TableHead>
                     )}
                   </TableRow>
@@ -294,7 +295,7 @@ export function ProductListPage() {
                             <Badge variant="secondary">Diarsipkan</Badge>
                           )}
                         </TableCell>
-                        {isOwner && (
+                        {canManage && (
                           <TableCell className="pr-4 text-right">
                             <div className="flex justify-end gap-1">
                               <Button

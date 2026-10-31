@@ -9,6 +9,7 @@ import { productsRouter } from "./modules/products/products.routes";
 import { customersRouter } from "./modules/customers/customers.routes";
 import { ordersRouter } from "./modules/orders/orders.routes";
 import { stockMovementsRouter } from "./modules/stock/stock.routes";
+import { usersRouter } from "./modules/users/users.routes";
 import { reportsRouter } from "./modules/reports/reports.routes";
 import { buildOpenApiDocument } from "./docs/openapi";
 import { ApiError } from "./utils/ApiError";
@@ -46,6 +47,7 @@ app.use("/api/v1/products", productsRouter);
 app.use("/api/v1/customers", customersRouter);
 app.use("/api/v1/orders", ordersRouter);
 app.use("/api/v1/stock-movements", stockMovementsRouter);
+app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/reports", reportsRouter);
 
 // Dokumentasi API. Terbuka di dev; di production ikut menyala (hanya dokumentasi,

@@ -5,6 +5,7 @@ import { LogOut, Menu } from "lucide-react";
 import { Sidebar } from "./Nav";
 import { useAuth } from "@/features/auth/AuthContext";
 import { Button } from "@/components/ui/button";
+import { ROLE_LABELS } from "@/types";
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -53,7 +54,7 @@ export function AppLayout() {
             <div className="text-right">
               <p className="text-sm leading-none font-medium">{user?.name}</p>
               <p className="text-muted-foreground text-xs">
-                {user?.role === "owner" ? "Pemilik" : "Staf"}
+                {user ? (ROLE_LABELS[user.role] ?? user.role) : ""}
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={handleLogout}>

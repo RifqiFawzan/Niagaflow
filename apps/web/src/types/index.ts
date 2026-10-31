@@ -1,10 +1,19 @@
-export type Role = "owner" | "staff";
+export type Role = "owner" | "admin" | "kasir" | "stock_manager" | "staff";
+
+export const ROLE_LABELS: Record<Role, string> = {
+  owner: "Pemilik",
+  admin: "Admin",
+  kasir: "Kasir",
+  stock_manager: "Pengelola stok",
+  staff: "Staf",
+};
 
 export type User = {
   id: string;
   name: string;
   email: string;
   role: Role;
+  createdAt?: string;
 };
 
 export type Paginated<T> = {

@@ -51,7 +51,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   next();
 }
 
-export function requireRole(role: Role) {
+/** Izinkan hanya peran yang disebut, contoh: requireRole("owner", "stock_manager"). */
+export function requireRole(...roles: Role[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({
@@ -59,7 +60,7 @@ export function requireRole(role: Role) {
         error: { code: "UNAUTHENTICATED", message: "Silakan login terlebih dahulu." },
       });
     }
-    if (req.user.role !== role) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         error: { code: "FORBIDDEN", message: "Anda tidak memiliki izin untuk tindakan ini." },

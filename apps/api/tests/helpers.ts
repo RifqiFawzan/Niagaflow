@@ -37,6 +37,15 @@ export async function resetFixtures() {
   const staff = await prisma.user.create({
     data: { name: "Staff Test", email: "staff@test.local", passwordHash, role: Role.staff },
   });
+  const kasir = await prisma.user.create({
+    data: { name: "Kasir Test", email: "kasir@test.local", passwordHash, role: Role.kasir },
+  });
+  const stockManager = await prisma.user.create({
+    data: { name: "Pengelola Stok Test", email: "stock@test.local", passwordHash, role: Role.stock_manager },
+  });
+  const admin = await prisma.user.create({
+    data: { name: "Admin Test", email: "admin@test.local", passwordHash, role: Role.admin },
+  });
 
   const makanan = await prisma.category.create({ data: { name: "Makanan" } });
   const minuman = await prisma.category.create({ data: { name: "Minuman" } });
@@ -76,7 +85,7 @@ export async function resetFixtures() {
     data: { name: "Budi Santoso", phone: "0812-9999-1111" },
   });
 
-  return { owner, staff, makanan, minuman, keripik, kue, teh, budi };
+  return { owner, staff, kasir, stockManager, admin, makanan, minuman, keripik, kue, teh, budi };
 }
 
 /** Login lewat endpoint asli, kembalikan cookie sesi siap pakai untuk request berikutnya. */

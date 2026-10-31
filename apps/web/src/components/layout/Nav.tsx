@@ -5,33 +5,47 @@ import {
   ReceiptText,
   Tags,
   TrendingUp,
+  UserCog,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { useAuth } from "@/features/auth/AuthContext";
 import { cn } from "@/lib/utils";
+import type { Role } from "@/types";
 
 type NavItem = {
   to: string;
   label: string;
   icon: LucideIcon;
-  ownerOnly?: boolean;
+  /** Sembunyikan dari peran di luar daftar (otorisasi tetap di backend). */
+  roles?: Role[];
 };
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/products", label: "Produk", icon: Package },
-  { to: "/categories", label: "Kategori", icon: Tags, ownerOnly: true },
+  {
+    to: "/categories",
+    label: "Kategori",
+    icon: Tags,
+    roles: ["owner", "stock_manager"],
+  },
   { to: "/customers", label: "Pelanggan", icon: Users },
   { to: "/orders", label: "Pesanan", icon: ReceiptText },
-  { to: "/reports", label: "Laporan", icon: TrendingUp, ownerOnly: true },
+  { to: "/reports", label: "Laporan", icon: TrendingUp, roles: ["owner"] },
+  {
+    to: "/users",
+    label: "Pengguna",
+    icon: UserCog,
+    roles: ["owner", "admin"],
+  },
 ];
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
   const items = NAV_ITEMS.filter(
-    (item) => !item.ownerOnly || user?.role === "owner"
+    (item) => !item.roles || (user ? item.roles.includes(user.role) : false)
   );
 
   return (

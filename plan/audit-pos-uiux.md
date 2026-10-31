@@ -90,6 +90,8 @@ ditutupi (lihat §4).
 
 8. **Peran belum 4 jenis** (§10.14 matriks akses). Sekarang owner + staff. Kasir, pengelola
    stok, admin belum ada sebagai peran terpisah.
+   **Selesai: ISSUE-020** — peran `admin`, `kasir`, `stock_manager` bertambah (staf lama
+   dipertahankan), matriks izin di backend, halaman kelola pengguna untuk owner & admin.
 
 ### P2 — efisiensi / polesan kecil
 
@@ -110,6 +112,8 @@ ditutupi (lihat §4).
 14. Ekspor PDF belum ada (§8.3, §15.4) — CSV sudah ada; PDF opsional.
 15. Notifikasi / inbox stok menipis belum ada (§15.8).
 16. Halaman pengaturan (profil, ganti password, kelola pengguna) belum ada (§12).
+    **Sebagian selesai: ISSUE-020** — kelola pengguna (buat akun + ubah peran) ada;
+    profil usaha & ganti password sendiri belum.
 
 ---
 
@@ -135,8 +139,8 @@ Kerjakan bertahap, mulai dari yang aman dan bernilai:
   **Selesai — ISSUE-016 (grafik + periode) dan ISSUE-017 (label stok + urut).**
 - **Tahap B (butuh keputusan Anda):** no. 1–3 (halaman POS + metode bayar + diskon),
   no. 6 (riwayat stok), no. 8 (peran), no. 13 (ganti tema).
-  **Sebagian selesai — ISSUE-018 (no. 1–3) dan ISSUE-019 (no. 6); sisa no. 8 (ISSUE-020)
-  dan no. 13 (ISSUE-021).**
+  **Sebagian selesai — ISSUE-018 (no. 1–3), ISSUE-019 (no. 6), ISSUE-020 (no. 8);
+  sisa no. 13 (ISSUE-021).**
 
 Setelah Anda pilih tahap/lingkup, tiap item dipecah jadi issue (backlog → loop),
 lalu dikerjakan satu per satu.

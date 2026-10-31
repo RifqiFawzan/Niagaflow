@@ -163,6 +163,17 @@ export const stockMovementSchema = registry.register(
   })
 );
 
+export const userSchema = registry.register(
+  "User",
+  z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    role: z.enum(["owner", "admin", "kasir", "stock_manager", "staff"]),
+    createdAt: z.string().datetime().optional(),
+  })
+);
+
 /* ------------------------------------------------------------------ *
  * Input (request body / query)
  * ------------------------------------------------------------------ */
@@ -248,6 +259,25 @@ export const stockMovementInput = registry.register(
     type: z.enum(["MASUK", "KELUAR"]),
     quantity: z.number().int().min(1),
     reason: z.string().min(1).max(500),
+  })
+);
+
+export const userInput = registry.register(
+  "UserInput",
+  z.object({
+    name: z.string().min(2).max(100),
+    email: z.string().email(),
+    password: z.string().min(8).max(200),
+    role: z.enum(["owner", "admin", "kasir", "stock_manager", "staff"]),
+  })
+);
+
+export const userUpdateInput = registry.register(
+  "UserUpdateInput",
+  z.object({
+    name: z.string().min(2).max(100).optional(),
+    password: z.string().min(8).max(200).optional(),
+    role: z.enum(["owner", "admin", "kasir", "stock_manager", "staff"]).optional(),
   })
 );
 

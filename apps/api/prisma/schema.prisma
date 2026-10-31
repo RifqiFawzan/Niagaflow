@@ -9,6 +9,9 @@ datasource db {
 
 enum Role {
   owner
+  admin
+  kasir
+  stock_manager
   staff
 }
 

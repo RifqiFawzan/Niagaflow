@@ -13,6 +13,7 @@ import { OrderListPage } from "./features/orders/OrderListPage";
 import { OrderCreatePage } from "./features/orders/OrderCreatePage";
 import { OrderDetailPage } from "./features/orders/OrderDetailPage";
 import { ReportPage } from "./features/reports/ReportPage";
+import { UserListPage } from "./features/users/UserListPage";
 
 export default function App() {
   return (
@@ -32,7 +33,7 @@ export default function App() {
         <Route
           path="/products/new"
           element={
-            <RoleGuard role="owner">
+            <RoleGuard role={["owner", "stock_manager"]}>
               <ProductFormPage />
             </RoleGuard>
           }
@@ -40,7 +41,7 @@ export default function App() {
         <Route
           path="/products/:id/edit"
           element={
-            <RoleGuard role="owner">
+            <RoleGuard role={["owner", "stock_manager"]}>
               <ProductFormPage />
             </RoleGuard>
           }
@@ -50,7 +51,7 @@ export default function App() {
         <Route
           path="/categories"
           element={
-            <RoleGuard role="owner">
+            <RoleGuard role={["owner", "stock_manager"]}>
               <CategoriesPage />
             </RoleGuard>
           }
@@ -67,6 +68,14 @@ export default function App() {
           element={
             <RoleGuard role="owner">
               <ReportPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <RoleGuard role={["owner", "admin"]}>
+              <UserListPage />
             </RoleGuard>
           }
         />

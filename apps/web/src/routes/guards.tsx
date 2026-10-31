@@ -17,10 +17,11 @@ export function RoleGuard({
   role,
   children,
 }: {
-  role: Role;
+  role: Role | Role[];
   children: ReactNode;
 }) {
   const { user } = useAuth();
-  if (user && user.role !== role) return <Navigate to="/dashboard" replace />;
+  const allowed = Array.isArray(role) ? role : [role];
+  if (user && !allowed.includes(user.role)) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }

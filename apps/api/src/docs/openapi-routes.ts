@@ -11,6 +11,9 @@ import {
   productUpdateInput,
   stockMovementInput,
   stockMovementSchema,
+  userSchema,
+  userInput,
+  userUpdateInput,
   categoryInput,
   categorySchema,
   customerInput,
@@ -104,7 +107,7 @@ registry.registerPath({
   method: "post",
   path: `${BASE}/categories`,
   tags: ["Kategori"],
-  summary: "Tambah kategori (owner)",
+  summary: "Tambah kategori (owner/pengelola stok)",
   request: { body: { content: { "application/json": { schema: categoryInput } } } },
   responses: {
     201: jsonResponse("Kategori dibuat.", okSchema(categorySchema)),
@@ -117,7 +120,7 @@ registry.registerPath({
   method: "patch",
   path: `${BASE}/categories/{id}`,
   tags: ["Kategori"],
-  summary: "Ubah nama kategori (owner)",
+  summary: "Ubah nama kategori (owner/pengelola stok)",
   request: {
     params: z.object({ id: z.string().uuid() }),
     body: { content: { "application/json": { schema: categoryInput } } },
@@ -134,7 +137,7 @@ registry.registerPath({
   method: "delete",
   path: `${BASE}/categories/{id}`,
   tags: ["Kategori"],
-  summary: "Hapus kategori (owner, hanya jika belum dipakai produk)",
+  summary: "Hapus kategori (owner/pengelola stok, hanya jika belum dipakai produk)",
   request: { params: z.object({ id: z.string().uuid() }) },
   responses: {
     200: jsonResponse("Kategori dihapus.", okSchema(z.null())),
@@ -192,7 +195,7 @@ registry.registerPath({
   method: "post",
   path: `${BASE}/products`,
   tags: ["Produk"],
-  summary: "Tambah produk (owner)",
+  summary: "Tambah produk (owner/pengelola stok)",
   request: { body: { content: { "application/json": { schema: productInput } } } },
   responses: {
     201: jsonResponse("Produk dibuat.", okSchema(productSchema)),
@@ -206,7 +209,7 @@ registry.registerPath({
   method: "patch",
   path: `${BASE}/products/{id}`,
   tags: ["Produk"],
-  summary: "Ubah produk (owner)",
+  summary: "Ubah produk (owner/pengelola stok)",
   request: {
     params: z.object({ id: z.string().uuid() }),
     body: { content: { "application/json": { schema: productUpdateInput } } },
@@ -224,7 +227,7 @@ registry.registerPath({
   method: "patch",
   path: `${BASE}/products/{id}/archive`,
   tags: ["Produk"],
-  summary: "Arsipkan atau aktifkan lagi produk (owner)",
+  summary: "Arsipkan atau aktifkan lagi produk (owner/pengelola stok)",
   description: "Produk arsip tidak muncul di daftar aktif dan tidak bisa dipesan lagi.",
   request: {
     params: z.object({ id: z.string().uuid() }),
@@ -379,7 +382,7 @@ registry.registerPath({
   method: "post",
   path: `${BASE}/orders`,
   tags: ["Pesanan"],
-  summary: "Buat pesanan (owner & staff)",
+  summary: "Buat pesanan (semua peran)",
   description:
     "Total dihitung server dari harga produk saat itu; harga yang dikirim klien diabaikan. " +
     "Stok dikurangi dalam satu transaksi. Bila ada item yang stoknya kurang, seluruh pesanan dibatalkan.",
@@ -396,7 +399,7 @@ registry.registerPath({
   method: "patch",
   path: `${BASE}/orders/{id}/status`,
   tags: ["Pesanan"],
-  summary: "Ubah status pesanan (owner & staff)",
+  summary: "Ubah status pesanan (semua peran)",
   description:
     "Alur status: `pending` -> `processing` -> `completed`. " +
     "Pesanan juga bisa dibatalkan dari `pending` atau `processing`; saat dibatalkan stok dikembalikan. " +
@@ -455,7 +458,7 @@ registry.registerPath({
   method: "post",
   path: `${BASE}/stock-movements`,
   tags: ["Riwayat stok"],
-  summary: "Catat stok masuk/keluar manual (owner)",
+  summary: "Catat stok masuk/keluar manual (owner/pengelola stok)",
   description: "Alasan wajib. Stok tidak boleh menjadi negatif (`INSUFFICIENT_STOCK`).",
   request: { body: { content: { "application/json": { schema: stockMovementInput } } } },
   responses: {
@@ -463,6 +466,61 @@ registry.registerPath({
     400: errorResponse("Data tidak valid atau stok kurang (`INSUFFICIENT_STOCK`)."),
     404: errorResponse("Produk tidak ditemukan."),
     ...securedResponses,
+  },
+});
+
+/* ------------------------------------------------------------------ *
+ * Pengguna & peran
+ * ------------------------------------------------------------------ */
+
+registry.registerPath({
+  method: "get",
+  path: `${BASE}/users`,
+  tags: ["Pengguna"],
+  summary: "Daftar pengguna (owner & admin)",
+  responses: {
+    200: jsonResponse("Daftar pengguna (tanpa password).", okSchema(z.array(userSchema))),
+    ...securedResponses,
+    403: errorResponse("Bukan owner/admin."),
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: `${BASE}/users`,
+  tags: ["Pengguna"],
+  summary: "Buat pengguna baru (owner & admin)",
+  description:
+    "Admin hanya dapat membuat peran non-owner (`FORBIDDEN` bila memberi peran owner). " +
+    "Email wajib unik (`EMAIL_DUPLICATE`), password minimal 8 karakter.",
+  request: { body: { content: { "application/json": { schema: userInput } } } },
+  responses: {
+    201: jsonResponse("Pengguna dibuat.", okSchema(userSchema)),
+    400: errorResponse("Data tidak valid."),
+    409: errorResponse("Email sudah terdaftar (`EMAIL_DUPLICATE`)."),
+    ...securedResponses,
+    403: errorResponse("Admin memberi peran owner."),
+  },
+});
+
+registry.registerPath({
+  method: "patch",
+  path: `${BASE}/users/{id}`,
+  tags: ["Pengguna"],
+  summary: "Ubah nama/peran/password pengguna (owner & admin)",
+  description:
+    "Admin tidak boleh menyentuh akun pemilik. Peran sendiri tidak bisa diubah " +
+    "(`SELF_ROLE_CHANGE`) supaya tidak terkunci sendiri.",
+  request: {
+    params: z.object({ id: z.string().uuid() }),
+    body: { content: { "application/json": { schema: userUpdateInput } } },
+  },
+  responses: {
+    200: jsonResponse("Pengguna diubah.", okSchema(userSchema)),
+    400: errorResponse("Data tidak valid atau ubah peran sendiri (`SELF_ROLE_CHANGE`)."),
+    404: errorResponse("Pengguna tidak ditemukan."),
+    ...securedResponses,
+    403: errorResponse("Admin menyentuh akun pemilik."),
   },
 });
 
