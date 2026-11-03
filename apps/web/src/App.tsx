@@ -7,8 +7,6 @@ import { ProductListPage } from "./features/products/ProductListPage";
 import { ProductFormPage } from "./features/products/ProductFormPage";
 import { StockMovementListPage } from "./features/stock/StockMovementListPage";
 import { CategoriesPage } from "./features/categories/CategoriesPage";
-import { CustomerListPage } from "./features/customers/CustomerListPage";
-import { CustomerDetailPage } from "./features/customers/CustomerDetailPage";
 import { OrderListPage } from "./features/orders/OrderListPage";
 import { OrderCreatePage } from "./features/orders/OrderCreatePage";
 import { OrderDetailPage } from "./features/orders/OrderDetailPage";
@@ -56,9 +54,6 @@ export default function App() {
             </RoleGuard>
           }
         />
-
-        <Route path="/customers" element={<CustomerListPage />} />
-        <Route path="/customers/:id" element={<CustomerDetailPage />} />
 
         <Route path="/orders" element={<OrderListPage />} />
         <Route path="/orders/new" element={<OrderCreatePage />} />

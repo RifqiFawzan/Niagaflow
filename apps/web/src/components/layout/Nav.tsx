@@ -6,7 +6,6 @@ import {
   Tags,
   TrendingUp,
   UserCog,
-  Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -31,7 +30,6 @@ const NAV_ITEMS: NavItem[] = [
     icon: Tags,
     roles: ["owner", "stock_manager"],
   },
-  { to: "/customers", label: "Pelanggan", icon: Users },
   { to: "/orders", label: "Pesanan", icon: ReceiptText },
   { to: "/reports", label: "Laporan", icon: TrendingUp, roles: ["owner"] },
   {

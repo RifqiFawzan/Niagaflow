@@ -47,14 +47,6 @@ export type Product = {
 
 export type OrderStatus = "pending" | "processing" | "completed" | "cancelled";
 
-export type Customer = {
-  id: string;
-  name: string;
-  phone: string | null;
-  notes: string | null;
-  createdAt?: string;
-};
-
 export type OrderItem = {
   id: string;
   productId: string;
@@ -75,7 +67,6 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 export type Order = {
   id: string;
   orderNumber: string;
-  customerId: string | null;
   status: OrderStatus;
   paymentMethod: PaymentMethod | null;
   amountPaid: number | null;
@@ -84,7 +75,6 @@ export type Order = {
   total: number | string;
   notes: string | null;
   createdAt: string;
-  customer?: { id: string; name: string; phone?: string } | null;
   creator?: { id: string; name: string };
   items?: OrderItem[];
   statusHistory?: Array<{
@@ -114,7 +104,6 @@ export type ReportSummary = {
   ordersByStatus: Partial<
     Record<OrderStatus, { count: number; total: number | string }>
   >;
-  newCustomers: number;
 };
 
 export type TopProduct = {

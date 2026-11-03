@@ -137,36 +137,6 @@ describe("izin role", () => {
     expect(res.body.data).toMatchObject({ sku: "NEW-OWNER-001", price: 12000 });
   });
 
-  it("staf boleh MEMBACA pelanggan (menu Pelanggan tampil untuk staf)", async () => {
-    const cookie = await loginCookie(fx.staff.email);
-
-    const list = await agent().get("/api/v1/customers").set("Cookie", cookie);
-    expect(list.status).toBe(200);
-
-    const detail = await agent().get(`/api/v1/customers/${fx.budi.id}`).set("Cookie", cookie);
-    expect(detail.status).toBe(200);
-    expect(detail.body.data).toMatchObject({ name: "Budi Santoso" });
-  });
-
-  it("staf TIDAK boleh menambah atau mengubah pelanggan → 403", async () => {
-    const cookie = await loginCookie(fx.staff.email);
-
-    const create = await agent()
-      .post("/api/v1/customers")
-      .set("Cookie", cookie)
-      .send({ name: "Pelanggan Baru" });
-    expect(create.status).toBe(403);
-
-    const update = await agent()
-      .patch(`/api/v1/customers/${fx.budi.id}`)
-      .set("Cookie", cookie)
-      .send({ name: "Diubah Staf" });
-    expect(update.status).toBe(403);
-
-    // Pastikan tidak ada data yang berubah.
-    const after = await prisma.customer.findUnique({ where: { id: fx.budi.id } });
-    expect(after?.name).toBe("Budi Santoso");
-  });
 });
 
 describe("peran baru (4 jenis, staf lama dipertahankan)", () => {

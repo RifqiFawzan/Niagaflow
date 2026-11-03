@@ -41,12 +41,16 @@ Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekat
   - [x] ISSUE-020 — Peran 4 jenis (owner, kasir, pengelola stok, admin) + halaman kelola pengguna (P1, audit no. 8 + no. 16)
   - [x] ISSUE-021 — Ganti tema primer #2563EB + font Inter (P2, audit no. 13; screenshot README ikut diulang)
 
+## Permintaan pengguna (3 Nov 2026)
+
+- [x] ISSUE-022 — Hapus fitur pelanggan (menu, halaman, API, kolom pesanan; tabel DB dibiarkan) ✅ 3 Nov 2026
+
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 
 Blocking sudah diperbaiki (commit perbaikan gate 3). Berikut yang ditunda:
 
 - [x] Batas tanggal laporan: `from` di-parse sebagai UTC sementara `to` lokal → bisa meleset 1 hari di perbatasan. **Selesai di ISSUE-013**: `resolveRange` kini menyelaraskan `from` ke awal hari lokal; test regresi ditambahkan.
-- [x] `/customers` tersembunyi dari nav staf tetapi route masih bisa diakses via URL langsung (hanya baca; tulis tetap owner-only). Konsistenkan saat ISSUE-014. **Selesai**: menu Pelanggan kini tampil untuk staf, sesuai perilaku API (staf memang boleh membaca). Tulis tetap owner-only, dibuktikan test.
+- [x] `/customers` tersembunyi dari nav staf tetapi route masih bisa diakses via URL langsung (hanya baca; tulis tetap owner-only). Konsistenkan saat ISSUE-014. **Selesai**: menu Pelanggan kini tampil untuk staf, sesuai perilaku API (staf memang boleh membaca). Tulis tetap owner-only, dibuktikan test. **Catatan 3 Nov 2026:** fitur pelanggan sudah dihapus seluruhnya di ISSUE-022 — temuan ini usang.
 - [x] Dead code di `Topbar`. Rapikan saat ISSUE-014. **Selesai**: dihapus dari `Nav.tsx`.
 - [ ] Tanggal selesai ISSUE-011 di dokumen tertulis 19 Okt, padahal commitnya 20 Okt. Dikoreksi pada commit perbaikan ini.
 - [ ] Riwayat Git masih memuat password DB dev lokal `niagaflow_dev_2026` dan satu `SESSION_SECRET` uji di commit lama. Sudah diganti di commit ISSUE-014, tapi belum dihapus dari riwayat. Butuh rewrite history — menunggu izin pemilik.

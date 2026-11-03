@@ -93,7 +93,7 @@ export function OrderListPage() {
               <Input
                 id="search-pesanan"
                 className="pl-9"
-                placeholder="No. pesanan atau pelanggan..."
+                placeholder="Cari no. pesanan..."
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -190,7 +190,6 @@ export function OrderListPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="pl-4">No. pesanan</TableHead>
-                    <TableHead>Pelanggan</TableHead>
                     <TableHead>Tanggal</TableHead>
                     <TableHead className="text-right">Item</TableHead>
                     <TableHead className="text-right">Total</TableHead>
@@ -203,9 +202,6 @@ export function OrderListPage() {
                     <TableRow key={order.id}>
                       <TableCell className="pl-4 font-mono text-xs">
                         {order.orderNumber}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {order.customer?.name ?? "Tanpa pelanggan"}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {formatDate(order.createdAt)}

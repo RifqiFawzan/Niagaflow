@@ -16,8 +16,6 @@ import {
   userUpdateInput,
   categoryInput,
   categorySchema,
-  customerInput,
-  customerSchema,
   loginInput,
   registry,
   securedResponses,
@@ -248,80 +246,6 @@ registry.registerPath({
 });
 
 /* ------------------------------------------------------------------ *
- * Pelanggan
- * ------------------------------------------------------------------ */
-
-registry.registerPath({
-  method: "get",
-  path: `${BASE}/customers`,
-  tags: ["Pelanggan"],
-  summary: "Daftar pelanggan",
-  request: {
-    query: z.object({ q: z.string().optional() }),
-  },
-  responses: {
-    200: jsonResponse("Daftar pelanggan.", okSchema(z.array(customerSchema))),
-    ...securedResponses,
-  },
-});
-
-registry.registerPath({
-  method: "get",
-  path: `${BASE}/customers/{id}`,
-  tags: ["Pelanggan"],
-  summary: "Detail satu pelanggan",
-  request: { params: z.object({ id: z.string().uuid() }) },
-  responses: {
-    200: jsonResponse("Detail pelanggan.", okSchema(customerSchema)),
-    400: errorResponse("Id bukan UUID."),
-    404: errorResponse("Pelanggan tidak ditemukan."),
-    ...securedResponses,
-  },
-});
-
-registry.registerPath({
-  method: "get",
-  path: `${BASE}/customers/{id}/orders`,
-  tags: ["Pelanggan"],
-  summary: "Riwayat pesanan milik satu pelanggan",
-  request: { params: z.object({ id: z.string().uuid() }) },
-  responses: {
-    200: jsonResponse("Riwayat pesanan.", okSchema(z.array(orderSchema))),
-    404: errorResponse("Pelanggan tidak ditemukan."),
-    ...securedResponses,
-  },
-});
-
-registry.registerPath({
-  method: "post",
-  path: `${BASE}/customers`,
-  tags: ["Pelanggan"],
-  summary: "Tambah pelanggan (owner)",
-  request: { body: { content: { "application/json": { schema: customerInput } } } },
-  responses: {
-    201: jsonResponse("Pelanggan dibuat.", okSchema(customerSchema)),
-    400: errorResponse("Data pelanggan tidak valid."),
-    ...securedResponses,
-  },
-});
-
-registry.registerPath({
-  method: "patch",
-  path: `${BASE}/customers/{id}`,
-  tags: ["Pelanggan"],
-  summary: "Ubah pelanggan (owner)",
-  request: {
-    params: z.object({ id: z.string().uuid() }),
-    body: { content: { "application/json": { schema: customerInput.partial() } } },
-  },
-  responses: {
-    200: jsonResponse("Pelanggan diubah.", okSchema(customerSchema)),
-    404: errorResponse("Pelanggan tidak ditemukan."),
-    ...securedResponses,
-  },
-});
-
-/* ------------------------------------------------------------------ *
  * Pesanan
  * ------------------------------------------------------------------ */
 
@@ -333,7 +257,7 @@ registry.registerPath({
   request: {
     query: z.object({
       status: z.enum(["pending", "processing", "completed", "cancelled"]).optional(),
-      q: z.string().optional().openapi({ description: "Cari di nomor pesanan / nama pelanggan." }),
+      q: z.string().optional().openapi({ description: "Cari di nomor pesanan." }),
       page: z.coerce.number().int().min(1).optional(),
       pageSize: z.coerce.number().int().min(1).max(100).optional(),
     }),

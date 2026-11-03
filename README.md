@@ -1,6 +1,6 @@
 # NiagaFlow
 
-Sistem manajemen pesanan, stok, dan penjualan untuk UMKM. Aplikasi web fullstack: produk, kategori, pelanggan, pesanan (dengan konsistensi stok), dashboard, dan laporan sederhana.
+Sistem manajemen pesanan, stok, dan penjualan untuk UMKM. Aplikasi web fullstack: produk, kategori, pesanan (dengan konsistensi stok), dashboard, dan laporan sederhana.
 
 ## Tech Stack
 
@@ -103,7 +103,6 @@ Dokumentasi ini dibuat dari skema Zod yang sama dengan validasi runtime, jadi ik
 | Auth      | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`                                 |
 | Kategori  | `GET/POST /categories`, `PATCH/DELETE /categories/:id`                                  |
 | Produk    | `GET/POST /products`, `GET/PATCH /products/:id`, `PATCH /products/:id/archive`          |
-| Pelanggan | `GET/POST /customers`, `GET/PATCH /customers/:id`, `GET /customers/:id/orders`           |
 | Pesanan   | `GET/POST /orders`, `GET /orders/:id`, `PATCH /orders/:id/status`                        |
 | Laporan   | `GET /reports/dashboard`, `GET /reports/summary`, `GET /reports/top-products`, `GET /reports/low-stock` |
 
@@ -111,7 +110,7 @@ Dokumentasi ini dibuat dari skema Zod yang sama dengan validasi runtime, jadi ik
 
 - **Sesi** memakai JWT di cookie `session`, bersifat `HttpOnly` + `SameSite=Lax`, dan `Secure` otomatis saat `NODE_ENV=production`. Cookie tidak bisa dibaca JavaScript, sehingga terlindung dari pencurian via XSS.
 - **Rate limit login**: 10 percobaan per menit per alamat IP. Percobaan ke-11 dan seterusnya ditolak dengan `429 RATE_LIMITED`.
-- **Otorisasi berbasis peran**: tulis kategori/pelanggan/produk hanya untuk `owner`; laporan penjualan hanya untuk `owner`; buat dan ubah status pesanan untuk `owner` dan `staff`.
+- **Otorisasi berbasis peran**: tulis kategori/produk hanya untuk `owner`; laporan penjualan hanya untuk `owner`; buat dan ubah status pesanan untuk `owner` dan `staff`.
 - **Header keamanan**: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`.
 - **CORS** hanya mengizinkan origin dari `WEB_ORIGIN`, bukan semua origin.
 - Rahasia (`SESSION_SECRET`, `DATABASE_URL`) dibaca dari environment; hanya file `.example` yang masuk Git.

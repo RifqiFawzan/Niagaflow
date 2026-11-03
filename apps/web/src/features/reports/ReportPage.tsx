@@ -131,38 +131,21 @@ export function ReportPage() {
         />
       ) : summary.isSuccess ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-muted-foreground text-sm font-medium">
-                  Total penjualan selesai
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold tabular-nums">
-                  {formatRupiah(summary.data.totalSalesCompleted)}
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  {formatDate(summary.data.from)} – {formatDate(summary.data.to)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-muted-foreground text-sm font-medium">
-                  Pelanggan baru
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold tabular-nums">
-                  {summary.data.newCustomers}
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Terdaftar pada rentang ini
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-muted-foreground text-sm font-medium">
+                Total penjualan selesai
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold tabular-nums">
+                {formatRupiah(summary.data.totalSalesCompleted)}
+              </p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                {formatDate(summary.data.from)} – {formatDate(summary.data.to)}
+              </p>
+            </CardContent>
+          </Card>
 
           <Card className="py-0">
             <CardHeader className="border-b py-4">

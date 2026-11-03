@@ -61,7 +61,6 @@ router.get(
           take: 5,
           orderBy: { createdAt: "desc" },
           include: {
-            customer: { select: { name: true } },
             items: { select: { quantity: true } },
           },
         }),
@@ -94,7 +93,7 @@ router.get(
     const { start, end } = resolveRange(parsed.data.from, parsed.data.to);
     const range = { gte: start, lte: end };
 
-    const [byStatus, salesAgg, customersInPeriod] = await Promise.all([
+    const [byStatus, salesAgg] = await Promise.all([
       prisma.order.groupBy({
         by: ["status"],
         where: { createdAt: range },
@@ -105,7 +104,6 @@ router.get(
         _sum: { total: true },
         where: { status: OrderStatus.completed, createdAt: range },
       }),
-      prisma.customer.count({ where: { createdAt: range } }),
     ]);
 
     const statusCounts: Record<string, { count: number; total: number }> = {};
@@ -123,7 +121,6 @@ router.get(
         to: end,
         totalSalesCompleted: money(salesAgg._sum.total),
         ordersByStatus: statusCounts,
-        newCustomers: customersInPeriod,
       },
     });
   })

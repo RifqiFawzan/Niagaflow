@@ -300,34 +300,6 @@ export function OrderDetailPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Pelanggan</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1 text-sm">
-              {data.customer ? (
-                <>
-                  <p className="font-medium">{data.customer.name}</p>
-                  {data.customer.phone && (
-                    <p className="text-muted-foreground">{data.customer.phone}</p>
-                  )}
-                  <Button
-                    asChild
-                    variant="link"
-                    size="sm"
-                    className="h-auto px-0"
-                  >
-                    <Link to={`/customers/${data.customer.id}`}>
-                      Lihat profil pelanggan
-                    </Link>
-                  </Button>
-                </>
-              ) : (
-                <p className="text-muted-foreground">Tanpa pelanggan.</p>
-              )}
-            </CardContent>
-          </Card>
-
           {data.notes && (
             <Card>
               <CardHeader>

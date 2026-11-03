@@ -70,17 +70,6 @@ export const productSchema = registry.register(
   })
 );
 
-export const customerSchema = registry.register(
-  "Customer",
-  z.object({
-    id: z.string().uuid(),
-    name: z.string(),
-    phone: z.string().nullable(),
-    notes: z.string().nullable(),
-    createdAt: z.string().datetime().optional(),
-  })
-);
-
 export const orderItemSchema = registry.register(
   "OrderItem",
   z.object({
@@ -101,7 +90,6 @@ export const orderSchema = registry.register(
     id: z.string().uuid(),
     orderNumber: z.string().openapi({ example: "ORD-20261020-8EX54X" }),
     status: z.enum(["pending", "processing", "completed", "cancelled"]),
-    customerId: z.string().uuid().nullable(),
     paymentMethod: z
       .enum(["TUNAI", "QRIS", "TRANSFER"])
       .nullable()
@@ -209,19 +197,9 @@ export const productUpdateInput = registry.register(
   productInput.partial()
 );
 
-export const customerInput = registry.register(
-  "CustomerInput",
-  z.object({
-    name: z.string().min(1).max(200),
-    phone: z.string().max(50).nullable().optional(),
-    notes: z.string().max(2000).nullable().optional(),
-  })
-);
-
 export const orderInput = registry.register(
   "OrderInput",
   z.object({
-    customerId: z.string().uuid().nullable().optional(),
     items: z
       .array(
         z.object({

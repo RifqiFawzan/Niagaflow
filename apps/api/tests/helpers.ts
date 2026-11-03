@@ -15,7 +15,7 @@ export const PASSWORD = "password123";
 
 export type Fixtures = Awaited<ReturnType<typeof resetFixtures>>;
 
-/** Reset seluruh data test lalu buat fixture dasar: 1 owner, 1 staff, 2 kategori, 3 produk, 1 pelanggan. */
+/** Reset seluruh data test lalu buat fixture dasar: 1 owner, 1 staff, 2 kategori, 3 produk. */
 export async function resetFixtures() {
   // Rate limiter in-memory ikut direset agar login berulang antar-test tidak kena 429.
   resetRateLimit();
@@ -25,7 +25,6 @@ export async function resetFixtures() {
   await prisma.orderStatusHistory.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
-  await prisma.customer.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
@@ -81,11 +80,7 @@ export async function resetFixtures() {
     },
   });
 
-  const budi = await prisma.customer.create({
-    data: { name: "Budi Santoso", phone: "0812-9999-1111" },
-  });
-
-  return { owner, staff, kasir, stockManager, admin, makanan, minuman, keripik, kue, teh, budi };
+  return { owner, staff, kasir, stockManager, admin, makanan, minuman, keripik, kue, teh };
 }
 
 /** Login lewat endpoint asli, kembalikan cookie sesi siap pakai untuk request berikutnya. */

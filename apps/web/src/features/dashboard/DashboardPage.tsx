@@ -152,7 +152,6 @@ export function DashboardPage() {
                           {order.orderNumber}
                         </p>
                         <p className="text-muted-foreground truncate text-xs">
-                          {order.customer?.name ?? "Tanpa pelanggan"} ·{" "}
                           {formatDate(order.createdAt)}
                         </p>
                       </div>

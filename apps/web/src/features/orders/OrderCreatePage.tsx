@@ -37,14 +37,11 @@ import { EmptyState, ErrorState, InlineLoading } from "@/components/ui/states";
 import {
   PAYMENT_METHOD_LABELS,
   type Category,
-  type Customer,
   type Order,
   type Paginated,
   type PaymentMethod,
   type Product,
 } from "@/types";
-
-const NONE = "none";
 
 type CartLine = {
   product: Product;
@@ -55,7 +52,6 @@ export function OrderCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [customerId, setCustomerId] = useState(NONE);
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -74,11 +70,6 @@ export function OrderCreatePage() {
   const categories = useQuery({
     queryKey: ["categories"],
     queryFn: () => api<Category[]>("/categories"),
-  });
-
-  const customers = useQuery({
-    queryKey: ["customers", "all"],
-    queryFn: () => api<Paginated<Customer>>("/customers?pageSize=100"),
   });
 
   const params = new URLSearchParams({ pageSize: "50" });
@@ -172,7 +163,6 @@ export function OrderCreatePage() {
       api<Order>("/orders", {
         method: "POST",
         body: JSON.stringify({
-          customerId: customerId === NONE ? null : customerId,
           items: lines.map((l) => ({
             productId: l.product.id,
             quantity: l.quantity,
@@ -453,23 +443,6 @@ export function OrderCreatePage() {
                   {error}
                 </p>
               )}
-
-              <div className="space-y-1.5">
-                <Label>Pelanggan (opsional)</Label>
-                <Select value={customerId} onValueChange={setCustomerId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Tanpa pelanggan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE}>Tanpa pelanggan</SelectItem>
-                    {(customers.data?.items ?? []).map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">

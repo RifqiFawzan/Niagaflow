@@ -13,7 +13,6 @@ const router = Router();
 router.use(requireAuth);
 
 const createOrderSchema = z.object({
-  customerId: z.string().uuid("Pelanggan tidak valid.").nullable().optional(),
   items: z
     .array(
       z.object({
@@ -59,20 +58,13 @@ router.post(
     if (!parsed.success) {
       throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0].message);
     }
-    const { customerId, items, discount, paymentMethod, amountPaid, notes } = parsed.data;
+    const { items, discount, paymentMethod, amountPaid, notes } = parsed.data;
     const userId = req.user!.id;
 
     // Tolak duplikat produk (sederhana & eksplisit)
     const ids = items.map((i) => i.productId);
     if (new Set(ids).size !== ids.length) {
       throw new ApiError(400, "DUPLICATE_ITEM", "Terdapat produk duplikat dalam pesanan.");
-    }
-
-    if (customerId) {
-      const customer = await prisma.customer.findUnique({ where: { id: customerId } });
-      if (!customer) {
-        throw new ApiError(400, "CUSTOMER_NOT_FOUND", "Pelanggan tidak ditemukan.");
-      }
     }
 
     const runTransaction = () =>
@@ -132,7 +124,6 @@ router.post(
         const order = await tx.order.create({
           data: {
             orderNumber: generateOrderNumber(),
-            customerId: customerId ?? null,
             createdBy: userId,
             status: OrderStatus.pending,
             paymentMethod: paymentMethod ?? null,
@@ -315,12 +306,7 @@ router.get(
           }
         : {}),
       ...(q
-        ? {
-            OR: [
-              { orderNumber: { contains: q, mode: "insensitive" } },
-              { customer: { name: { contains: q, mode: "insensitive" } } },
-            ],
-          }
+        ? { orderNumber: { contains: q, mode: "insensitive" } }
         : {}),
     };
 
@@ -332,7 +318,6 @@ router.get(
         skip: (page - 1) * pageSize,
         take: pageSize,
         include: {
-          customer: { select: { id: true, name: true } },
           items: { select: { id: true, quantity: true } },
         },
       }),
@@ -358,7 +343,6 @@ router.get(
     const order = await prisma.order.findUnique({
       where: { id },
       include: {
-        customer: { select: { id: true, name: true, phone: true } },
         creator: { select: { id: true, name: true } },
         items: true,
         statusHistory: { orderBy: { changedAt: "asc" } },
