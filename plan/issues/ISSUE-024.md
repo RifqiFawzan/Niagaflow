@@ -49,12 +49,18 @@ Mengganti katalog aplikasi dengan menu Yessy Kitchen dari `menu_yessy.md`.
 | API `/products` dengan sesi login | 200, item menu tampil dengan harga benar |
 | `npm run build` (web) | Lulus |
 
-## Production (belum)
+## Production (selesai 6 Nov 2026)
 
-Setelah disetujui, jalankan dari `apps/api` dengan `DATABASE_URL` production:
+Seed dijalankan ke Neon production dari `apps/api` dengan `NODE_ENV=production`.
 
-```
-npm run seed
-```
+Hasil verifikasi lewat API production:
 
-Butuh env `DEMO_PASSWORD` (minimal 12 karakter) bila `NODE_ENV=production`.
+- Total produk 73, **69 aktif**.
+- Food 15, Drinks 17, Nasi Goreng & Mie 6, Soft Drinks 4, Snacks 12,
+  Seafood Specialities 15 (Lobster nonaktif).
+- Produk demo `MKN-001`, `MKN-002`, `MNM-001` semuanya nonaktif.
+- Lobster: harga 0, stok 0, nonaktif.
+- Endpoint pemilih pesanan (hanya aktif) mengembalikan 69 item.
+
+Catatan: seed butuh env `DEMO_PASSWORD` (minimal 12 karakter) bila
+`NODE_ENV=production`. Seed aman dijalankan ulang.
