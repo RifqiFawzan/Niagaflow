@@ -42,7 +42,7 @@ router.post("/login", asyncHandler(async (req, res) => {
     });
   }
 
-  res.cookie(SESSION_COOKIE, signSession(user.id), sessionCookieOptions);
+  res.cookie(SESSION_COOKIE, signSession(user.id), sessionCookieOptions());
   res.json({
     success: true,
     data: { id: user.id, name: user.name, email: user.email, role: user.role },
@@ -51,7 +51,7 @@ router.post("/login", asyncHandler(async (req, res) => {
 
 router.post("/logout", (_req, res) => {
   // Opsi harus sama dengan saat cookie dibuat, atau browser tidak menghapusnya.
-  res.clearCookie(SESSION_COOKIE, sessionCookieOptions);
+  res.clearCookie(SESSION_COOKIE, sessionCookieOptions());
   res.json({ success: true, data: null });
 });
 

@@ -3,14 +3,15 @@ import jwt from "jsonwebtoken";
 const SESSION_COOKIE = "session";
 const DEFAULT_SESSION_TTL_DAYS = 30;
 
-/** Durasi sesi (hari). Bisa diatur lewat env SESSION_TTL_DAYS; default 30 hari. */
-function resolveSessionTtlDays(): number {
+/**
+ * Durasi sesi (hari), dibaca saat dipakai — bukan saat modul dimuat.
+ * Di lokal, `.env` baru termuat lewat Prisma Client; kalau dibaca di awal,
+ * `SESSION_TTL_DAYS` terlewat dan yang terpakai default.
+ */
+export function sessionTtlDays(): number {
   const raw = Number(process.env.SESSION_TTL_DAYS);
   return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : DEFAULT_SESSION_TTL_DAYS;
 }
-
-export const SESSION_TTL_DAYS = resolveSessionTtlDays();
-export const SESSION_TTL_MS = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
 
 function getSecret(): string {
   const secret = process.env.SESSION_SECRET;
@@ -25,7 +26,7 @@ function getSecret(): string {
 
 export function signSession(userId: string): string {
   return jwt.sign({ sub: userId }, getSecret(), {
-    expiresIn: `${SESSION_TTL_DAYS}d`,
+    expiresIn: `${sessionTtlDays()}d`,
   });
 }
 
@@ -45,13 +46,13 @@ export function verifySession(token: string): string | null {
 // cookie tetap first-party. SameSite=Lax cukup dan paling aman; cookie
 // third-party (SameSite=None) diblokir browser HP (Safari/Chrome), yang membuat
 // sesi hilang dan data tidak muncul di smartphone.
-const isProduction = process.env.NODE_ENV === "production";
-
-export const sessionCookieOptions = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: isProduction,
-  maxAge: SESSION_TTL_MS,
-};
+export function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: sessionTtlDays() * 24 * 60 * 60 * 1000,
+  };
+}
 
 export { SESSION_COOKIE };

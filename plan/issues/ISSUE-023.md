@@ -30,8 +30,12 @@ situs berbeda. Web memanggil API langsung (env `VITE_API_URL`), sehingga cookie
    menjadi first-party dan diterima semua browser HP.
 2. **Cookie `SameSite=Lax`** (sebelumnya `None` di production). Dengan satu
    domain, `Lax` cukup dan lebih aman.
-3. **Umur sesi 30 hari**, bisa diatur lewat env `SESSION_TTL_DAYS` (JWT dan
-   `maxAge` cookie selalu sinkron). Sebelumnya hardcode 7 hari.
+3. **Umur sesi default 30 hari**, bisa diatur lewat env `SESSION_TTL_DAYS` (JWT
+   dan `maxAge` cookie selalu sinkron). Sebelumnya hardcode 7 hari. Nilai env
+   dibaca saat request (bukan saat modul dimuat) karena di lokal `.env` baru
+   termuat lewat Prisma Client — kalau dibaca di awal, nilai dari `.env` terlewat
+   dan yang terpakai default. Lokal diisi `SESSION_TTL_DAYS=7` di
+   `apps/api/.env` (tidak di-commit); production tetap 30 hari.
 4. Dokumentasi (`README.md`, `docs/DEPLOY.md`, `.env.example`,
    `.env.production.example`) diperbarui: `VITE_API_URL` **jangan diisi** di
    hosting.
@@ -51,6 +55,7 @@ situs berbeda. Web memanggil API langsung (env `VITE_API_URL`), sehingga cookie
 
 - [x] Cookie sesi production memakai `SameSite=Lax` (bukan `None`)
 - [x] Umur sesi default 30 hari dan bisa diatur lewat `SESSION_TTL_DAYS`
+      (lokal diuji dengan 7 hari)
 - [x] Frontend memakai path relatif `/api`; rewrite Vercel meneruskan ke backend
 - [x] Dokumentasi deploy tidak lagi menyuruh mengisi `VITE_API_URL`
 - [x] Typecheck API + web hijau, test API 62/62 lulus, build web hijau
@@ -60,7 +65,8 @@ situs berbeda. Web memanggil API langsung (env `VITE_API_URL`), sehingga cookie
 
 | Uji | Hasil |
 |---|---|
-| Login lokal, cek header `Set-Cookie` | `Max-Age=2592000` (30 hari), `HttpOnly`, `SameSite=Lax` |
+| Login lokal (`SESSION_TTL_DAYS=7`), cek header `Set-Cookie` | `Max-Age=604800` (7 hari), `HttpOnly`, `SameSite=Lax` |
+| Login lokal tanpa env (default) | `Max-Age=2592000` (30 hari) |
 | `npx tsc --noEmit` (api) | Lulus |
 | `npm test` (api) | 62/62 lulus |
 | `npm run build` (web) | Lulus |
@@ -71,7 +77,7 @@ situs berbeda. Web memanggil API langsung (env `VITE_API_URL`), sehingga cookie
 1. **Web dulu:** hapus env `VITE_API_URL` di project frontend Vercel, lalu
    redeploy. `vercel.json` baru ikut ter-deploy.
 2. **API:** redeploy agar cookie `SameSite=Lax` + TTL 30 hari aktif. Opsional isi
-   `SESSION_TTL_DAYS` bila tidak ingin 30 hari.
+   `SESSION_TTL_DAYS` di Vercel bila tidak ingin 30 hari (misalnya `7`).
 3. Uji di HP: login, buka Produk/Pesanan, pastikan data muncul dan sesi bertahan
    setelah browser ditutup.
 
