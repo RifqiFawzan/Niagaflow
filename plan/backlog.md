@@ -49,6 +49,10 @@ Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekat
 
 - [x] ISSUE-023 — Sesi HP: API lewat domain web (rewrite `/api`), cookie `SameSite=Lax`, umur sesi 30 hari (`SESSION_TTL_DAYS`) ✅ 6 Nov 2026
 
+## Katalog Yessy Kitchen (6 Nov 2026)
+
+- [x] ISSUE-024 — Ganti katalog demo dengan menu Yessy Kitchen (70 item, 6 kategori); produk demo dinonaktifkan (tidak dihapus) — selesai 6 Nov 2026
+
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 
 Blocking sudah diperbaiki (commit perbaikan gate 3). Berikut yang ditunda:

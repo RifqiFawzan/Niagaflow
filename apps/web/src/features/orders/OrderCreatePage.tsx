@@ -72,7 +72,9 @@ export function OrderCreatePage() {
     queryFn: () => api<Category[]>("/categories"),
   });
 
-  const params = new URLSearchParams({ pageSize: "50" });
+  // Katalog Yessy Kitchen > 50 item; ambil maksimum yang diizinkan API agar
+  // semua menu tampil di tab "Semua" tanpa harus mencari.
+  const params = new URLSearchParams({ pageSize: "100" });
   if (debouncedSearch) params.set("q", debouncedSearch);
   if (categoryId !== "all") params.set("categoryId", categoryId);
   const query = params.toString();
