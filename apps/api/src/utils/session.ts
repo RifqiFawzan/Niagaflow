@@ -1,7 +1,16 @@
 import jwt from "jsonwebtoken";
 
 const SESSION_COOKIE = "session";
-const SESSION_TTL_DAYS = 7;
+const DEFAULT_SESSION_TTL_DAYS = 30;
+
+/** Durasi sesi (hari). Bisa diatur lewat env SESSION_TTL_DAYS; default 30 hari. */
+function resolveSessionTtlDays(): number {
+  const raw = Number(process.env.SESSION_TTL_DAYS);
+  return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : DEFAULT_SESSION_TTL_DAYS;
+}
+
+export const SESSION_TTL_DAYS = resolveSessionTtlDays();
+export const SESSION_TTL_MS = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
 
 function getSecret(): string {
   const secret = process.env.SESSION_SECRET;
@@ -32,17 +41,17 @@ export function verifySession(token: string): string | null {
   }
 }
 
-// Frontend dan backend berdiri di domain berbeda, jadi browser menganggapnya
-// lintas situs. Cookie dengan SameSite=Lax tidak akan dikirim saat fetch lintas
-// situs, sehingga semua request setelah login gagal 401. SameSite=None
-// mengizinkannya, dan selalu disertai Secure.
+// Frontend memanggil API lewat path yang sama (rewrite /api di Vercel), jadi
+// cookie tetap first-party. SameSite=Lax cukup dan paling aman; cookie
+// third-party (SameSite=None) diblokir browser HP (Safari/Chrome), yang membuat
+// sesi hilang dan data tidak muncul di smartphone.
 const isProduction = process.env.NODE_ENV === "production";
 
 export const sessionCookieOptions = {
   httpOnly: true,
-  sameSite: isProduction ? ("none" as const) : ("lax" as const),
+  sameSite: "lax" as const,
   secure: isProduction,
-  maxAge: SESSION_TTL_DAYS * 24 * 60 * 60 * 1000,
+  maxAge: SESSION_TTL_MS,
 };
 
 export { SESSION_COOKIE };

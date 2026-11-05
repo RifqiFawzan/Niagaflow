@@ -45,6 +45,10 @@ Dijalankan mengikuti `workflow.md`: audit selesai → **menunggu tinjau pendekat
 
 - [x] ISSUE-022 — Hapus fitur pelanggan (menu, halaman, API, kolom pesanan; tabel DB dibiarkan) ✅ 3 Nov 2026
 
+## Perbaikan sesi (6 Nov 2026)
+
+- [x] ISSUE-023 — Sesi HP: API lewat domain web (rewrite `/api`), cookie `SameSite=Lax`, umur sesi 30 hari (`SESSION_TTL_DAYS`) ✅ 6 Nov 2026
+
 ## Temuan tertunda (PM GATE 3 — 20 Okt 2026)
 
 Blocking sudah diperbaiki (commit perbaikan gate 3). Berikut yang ditunda:

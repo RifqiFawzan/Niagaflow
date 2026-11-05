@@ -31,8 +31,10 @@ export function isApiErrorCode(err: unknown, code: string): boolean {
  * Di lokal kosong, sehingga permintaan memakai path relatif `/api/v1` dan
  * diteruskan proxy dev Vite ke http://localhost:4000.
  *
- * Di hosting, isi VITE_API_URL dengan URL backend (tanpa garis miring di akhir),
- * mis. "https://niagaflow-api.onrender.com".
+ * Di hosting biarkan kosong juga: `vercel.json` meneruskan `/api/*` ke backend,
+ * sehingga cookie sesi tetap first-party dan tidak diblokir browser HP.
+ * Isi VITE_API_URL hanya bila API berada di domain lain yang tidak bisa
+ * diproksikan lewat `vercel.json`.
  */
 const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
 

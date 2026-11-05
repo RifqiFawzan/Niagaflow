@@ -108,7 +108,7 @@ Dokumentasi ini dibuat dari skema Zod yang sama dengan validasi runtime, jadi ik
 
 ### Keamanan
 
-- **Sesi** memakai JWT di cookie `session`, bersifat `HttpOnly` + `SameSite=Lax`, dan `Secure` otomatis saat `NODE_ENV=production`. Cookie tidak bisa dibaca JavaScript, sehingga terlindung dari pencurian via XSS.
+- **Sesi** memakai JWT di cookie `session`, bersifat `HttpOnly` + `SameSite=Lax`, dan `Secure` otomatis saat `NODE_ENV=production`. Umur sesi 30 hari (ubah lewat `SESSION_TTL_DAYS`). Cookie tidak bisa dibaca JavaScript, sehingga terlindung dari pencurian via XSS.
 - **Rate limit login**: 10 percobaan per menit per alamat IP. Percobaan ke-11 dan seterusnya ditolak dengan `429 RATE_LIMITED`.
 - **Otorisasi berbasis peran**: tulis kategori/produk hanya untuk `owner`; laporan penjualan hanya untuk `owner`; buat dan ubah status pesanan untuk `owner` dan `staff`.
 - **Header keamanan**: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`.
@@ -129,7 +129,7 @@ Panduan langkah demi langkah ada di [`docs/DEPLOY.md`](docs/DEPLOY.md). Isi envi
 
 Dua hal yang paling sering bikin gagal:
 
-1. Frontend **wajib** diberi env `VITE_API_URL` berisi URL backend. Tanpa itu, permintaan API menuju domain frontend sendiri dan login gagal. Di lokal env ini boleh kosong karena ada proxy dev Vite.
+1. Frontend memakai path relatif `/api`. `apps/web/vercel.json` meneruskan `/api/*` ke backend, jadi **jangan** isi `VITE_API_URL` di hosting (cukup kosongkan). Ini penting: kalau frontend memanggil domain backend langsung, cookie sesi jadi third-party dan diblokir browser HP.
 2. Backend **wajib** diberi `WEB_ORIGIN` berisi URL frontend. Kalau tidak cocok, CORS menolak semua permintaan.
 
 ## Catatan
