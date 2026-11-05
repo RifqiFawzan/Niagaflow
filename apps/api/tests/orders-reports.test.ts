@@ -449,7 +449,11 @@ describe("laporan", () => {
   it("filter rentang tanggal membatasi data; rentang kosong → penjualan 0", async () => {
     await seedOrder({ productId: fx.keripik.id, quantity: 2, complete: true });
     const now = new Date();
-    const today = now.toISOString().slice(0, 10);
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
     const wide = await agent()
       .get(`/api/v1/reports/summary?from=${today}&to=${today}`)
       .set("Cookie", cookie);
