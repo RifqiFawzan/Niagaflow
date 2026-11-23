@@ -132,7 +132,7 @@ export function UserListPage() {
                           </Button>
                         ) : (
                           <span className="text-muted-foreground text-xs">
-                            —
+                            <span className="sr-only">Tidak ada aksi</span>-
                           </span>
                         )}
                       </TableCell>
@@ -250,7 +250,7 @@ function CreateUserDialog({
           <div className="space-y-2">
             <Label>Peran</Label>
             <Select value={role} onValueChange={(v) => setRole(v as Role)}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full" aria-label="Peran">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -262,7 +262,11 @@ function CreateUserDialog({
               </SelectContent>
             </Select>
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {error ? (
+            <p role="alert" className="text-destructive-text text-sm">
+              {error}
+            </p>
+          ) : null}
           <DialogFooter>
             <Button
               type="button"
@@ -324,14 +328,14 @@ function ChangeRoleDialog({
         <DialogHeader>
           <DialogTitle>Ubah peran</DialogTitle>
           <DialogDescription>
-            {target ? `${target.name} — ${target.email}` : ""}
+            {target ? `${target.name} (${target.email})` : ""}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Peran baru</Label>
             <Select value={role} onValueChange={(v) => setRole(v as Role)}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full" aria-label="Peran baru">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -343,7 +347,11 @@ function ChangeRoleDialog({
               </SelectContent>
             </Select>
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {error ? (
+            <p role="alert" className="text-destructive-text text-sm">
+              {error}
+            </p>
+          ) : null}
           <DialogFooter>
             <Button
               type="button"

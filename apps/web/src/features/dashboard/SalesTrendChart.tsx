@@ -12,7 +12,13 @@ import {
 import { api, errorMessage } from "@/lib/api";
 import { formatDate, formatRupiah } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { RANGES, shortLabel, type RangeDays } from "./period";
@@ -42,19 +48,31 @@ export function SalesTrendChart({ days, onDaysChange, from, to }: Props) {
   const hasSales = points.some((p) => p.sales > 0);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle>Tren penjualan</CardTitle>
-        <div className="flex items-center gap-1 rounded-lg border p-0.5">
+    <Card className="py-0">
+      <CardHeader className="border-border flex flex-col gap-3 border-b py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <CardTitle>Penjualan selesai per hari</CardTitle>
+          <CardDescription className="mt-1">
+            {data
+              ? `${formatDate(data.from)} – ${formatDate(data.to)}`
+              : "Pergeseran nilai transaksi selesai pada rentang terpilih."}
+          </CardDescription>
+        </div>
+        <div
+          role="group"
+          aria-label="Rentang waktu grafik penjualan"
+          className="border-border bg-background inline-flex w-fit items-center gap-1 rounded-[5px] border p-1"
+        >
           {RANGES.map((r) => (
             <button
               key={r.days}
               type="button"
+              aria-pressed={days === r.days}
               onClick={() => onDaysChange(r.days)}
               className={cn(
-                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                "min-h-10 sm:min-h-7 rounded-[4px] px-3 py-1 font-mono text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                 days === r.days
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-surface-elevated text-primary"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -63,9 +81,9 @@ export function SalesTrendChart({ days, onDaysChange, from, to }: Props) {
           ))}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="py-5">
         {isPending ? (
-          <Skeleton className="h-64 w-full rounded-xl" />
+          <Skeleton className="h-64 w-full rounded-[5px]" />
         ) : isError ? (
           <ErrorState
             message={errorMessage(error, "Gagal memuat tren penjualan.")}
@@ -73,8 +91,8 @@ export function SalesTrendChart({ days, onDaysChange, from, to }: Props) {
           />
         ) : !hasSales ? (
           <EmptyState
-            title="Belum ada penjualan"
-            description="Pesanan selesai pada rentang ini akan muncul sebagai grafik."
+            title="Belum ada penjualan selesai"
+            description="Pesanan berstatus selesai pada rentang ini akan tampil sebagai grafik harian."
           />
         ) : (
           <div className="h-64 w-full">
@@ -85,70 +103,64 @@ export function SalesTrendChart({ days, onDaysChange, from, to }: Props) {
               >
                 <defs>
                   <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="0%"
-                      stopColor="var(--chart-1)"
-                      stopOpacity={0.35}
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor="var(--chart-1)"
-                      stopOpacity={0}
-                    />
+                    <stop offset="0%" stopColor="#8ef5b5" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="#8ef5b5" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  className="stroke-border"
+                  stroke="#585657"
+                  strokeOpacity={0.65}
                   vertical={false}
                 />
                 <XAxis
                   dataKey="label"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 11, fill: "#b9b9b9" }}
                   minTickGap={24}
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  width={64}
-                  tick={{ fontSize: 11 }}
+                  width={76}
+                  tick={{ fontSize: 11, fill: "#b9b9b9" }}
                   tickFormatter={(v: number) => formatRupiah(v)}
                 />
                 <Tooltip
-                  cursor={{ stroke: "var(--border)" }}
+                  cursor={{ stroke: "#8e8e8e" }}
                   contentStyle={{
-                    borderRadius: 8,
+                    borderRadius: 5,
                     fontSize: 12,
-                    borderColor: "var(--border)",
+                    backgroundColor: "#242226",
+                    borderColor: "#8e8e8e",
+                    color: "#ffffff",
                   }}
+                  labelStyle={{ color: "#b9b9b9", marginBottom: 4 }}
+                  itemStyle={{ color: "#8ef5b5" }}
                   formatter={(value, name) =>
                     name === "sales"
                       ? [formatRupiah(Number(value)), "Penjualan"]
                       : [String(value ?? 0), "Pesanan"]
                   }
                   labelFormatter={(_label, payload) => {
-                    const d = (payload?.[0]?.payload as { date?: string } | undefined)?.date;
+                    const d = (
+                      payload?.[0]?.payload as { date?: string } | undefined
+                    )?.date;
                     return d ? formatDate(`${d}T00:00:00`) : "";
                   }}
                 />
                 <Area
                   type="monotone"
                   dataKey="sales"
-                  stroke="var(--chart-1)"
+                  stroke="#8ef5b5"
                   strokeWidth={2}
                   fill="url(#fillSales)"
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        )}
-        {data && (
-          <p className="text-muted-foreground mt-3 text-xs">
-            {formatDate(data.from)} – {formatDate(data.to)} · hanya pesanan
-            selesai
-          </p>
         )}
       </CardContent>
     </Card>

@@ -295,7 +295,7 @@ export function OrderCreatePage() {
                   description="Coba ubah kata kunci atau filter kategori."
                 />
               ) : (
-                <ul className="divide-border max-h-96 divide-y overflow-y-auto rounded-lg border">
+                <ul className="divide-border max-h-96 divide-y overflow-y-auto rounded-[5px] border">
                   {catalog.map((product) => {
                     const inCart = cartQuantities.get(product.id) ?? 0;
                     const remaining = product.stock - inCart;
@@ -373,7 +373,7 @@ export function OrderCreatePage() {
                             )}
                           </p>
                           {exceeds && (
-                            <p className="text-destructive text-xs">
+                            <p className="text-destructive-text text-xs">
                               Melebihi stok tersedia ({line.product.stock}).
                             </p>
                           )}
@@ -440,7 +440,7 @@ export function OrderCreatePage() {
               {error && (
                 <p
                   role="alert"
-                  className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm"
+                  className="border-destructive-text/40 bg-destructive/15 text-destructive-text rounded-[5px] border px-3 py-2 text-sm"
                 >
                   {error}
                 </p>
@@ -456,7 +456,8 @@ export function OrderCreatePage() {
                     }
                   >
                     <SelectTrigger
-                      className="h-8 w-20"
+                      size="sm"
+                      className="w-20"
                       aria-label="Tipe diskon"
                     >
                       <SelectValue />
@@ -483,14 +484,14 @@ export function OrderCreatePage() {
                   aria-invalid={discountInvalid || discountTooBig}
                 />
                 {discountInvalid && (
-                  <p className="text-destructive text-xs">
+                  <p className="text-destructive-text text-xs">
                     {discountMode === "nominal"
                       ? "Diskon harus angka bulat 0 atau lebih."
                       : "Diskon persen harus angka 0–100."}
                   </p>
                 )}
                 {discountTooBig && (
-                  <p className="text-destructive text-xs">
+                  <p className="text-destructive-text text-xs">
                     Diskon tidak boleh melebihi subtotal.
                   </p>
                 )}
@@ -537,19 +538,19 @@ export function OrderCreatePage() {
                     aria-invalid={amountPaidInvalid || amountTooSmall}
                   />
                   {amountPaidInvalid && (
-                    <p className="text-destructive text-xs">
+                    <p className="text-destructive-text text-xs">
                       Uang diterima harus angka bulat.
                     </p>
                   )}
                   {amountTooSmall && (
-                    <p className="text-destructive text-xs">
+                    <p className="text-destructive-text text-xs">
                       Uang diterima kurang dari total pesanan.
                     </p>
                   )}
                   {change !== null && (
                     <p className="text-sm">
                       Kembalian:{" "}
-                      <span className="font-semibold tabular-nums">
+                      <span className="font-medium text-primary tabular-nums">
                         {formatRupiah(change)}
                       </span>
                     </p>
@@ -579,7 +580,7 @@ export function OrderCreatePage() {
                       −{formatRupiah(discountValue)}
                     </dd>
                   </div>
-                  <div className="flex justify-between text-base font-semibold">
+                  <div className="flex justify-between text-base font-medium">
                     <dt>Perkiraan total</dt>
                     <dd className="tabular-nums">
                       {formatRupiah(estimatedTotal)}

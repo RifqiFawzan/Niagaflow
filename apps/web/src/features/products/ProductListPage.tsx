@@ -213,9 +213,9 @@ export function ProductListPage() {
           description="Coba ubah kata kunci atau filter, atau tambah produk baru."
           action={
             canManage ? (
-              <Button asChild size="sm">
+              <Button asChild variant="outline" size="sm">
                 <Link to="/products/new">
-                  <Plus />
+                  <Plus aria-hidden="true" />
                   Produk baru
                 </Link>
               </Button>
@@ -262,10 +262,10 @@ export function ProductListPage() {
                             className={cn(
                               "tabular-nums",
                               product.stock === 0 &&
-                                "font-semibold text-red-600",
+                                "text-destructive-text font-medium",
                               low &&
                                 product.stock > 0 &&
-                                "font-semibold text-amber-600"
+                                "text-warning-text font-medium"
                             )}
                           >
                             {product.stock}
@@ -279,20 +279,31 @@ export function ProductListPage() {
                           {/* Status stok konsisten (pedoman §9): Aman / Menipis / Habis. */}
                           {product.isActive ? (
                             product.stock === 0 ? (
-                              <Badge className="border-transparent bg-red-100 text-red-700">
+                              <Badge
+                                variant="outline"
+                                className="border-destructive-text/40 bg-destructive/15 text-destructive-text rounded-full font-mono"
+                              >
                                 Habis
                               </Badge>
                             ) : low ? (
-                              <Badge className="border-transparent bg-amber-100 text-amber-700">
+                              <Badge
+                                variant="outline"
+                                className="border-warning-text/40 bg-[#f8d082]/10 text-warning-text rounded-full font-mono"
+                              >
                                 Menipis (sisa {product.stock})
                               </Badge>
                             ) : (
-                              <Badge className="border-transparent bg-emerald-100 text-emerald-700">
+                              <Badge
+                                variant="outline"
+                                className="border-primary/45 bg-primary/12 text-primary rounded-full font-mono"
+                              >
                                 Aman
                               </Badge>
                             )
                           ) : (
-                            <Badge variant="secondary">Diarsipkan</Badge>
+                            <Badge variant="secondary" className="rounded-full font-mono">
+                              Diarsipkan
+                            </Badge>
                           )}
                         </TableCell>
                         {canManage && (

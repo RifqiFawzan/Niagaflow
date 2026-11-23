@@ -3,6 +3,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   LabelList,
   ResponsiveContainer,
   Tooltip,
@@ -12,7 +13,13 @@ import {
 
 import { api, errorMessage } from "@/lib/api";
 import { formatRupiah } from "@/lib/format";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import type { TopProduct } from "@/types";
@@ -35,13 +42,16 @@ export function TopProductsChart({ from, to }: Props) {
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Produk terlaris</CardTitle>
+    <Card className="h-full py-0">
+      <CardHeader className="border-border border-b py-5">
+        <CardTitle>Produk dengan pendapatan tertinggi</CardTitle>
+        <CardDescription>
+          Urutan kontribusi penjualan selesai pada rentang terpilih.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="py-5">
         {isPending ? (
-          <Skeleton className="h-64 w-full rounded-xl" />
+          <Skeleton className="h-64 w-full rounded-[5px]" />
         ) : isError ? (
           <ErrorState
             message={errorMessage(error, "Gagal memuat produk terlaris.")}
@@ -50,7 +60,7 @@ export function TopProductsChart({ from, to }: Props) {
         ) : rows.length === 0 ? (
           <EmptyState
             title="Belum ada penjualan"
-            description="Pesanan selesai pada rentang ini akan muncul sebagai grafik."
+            description="Produk terlaris akan tampil setelah ada pesanan selesai."
           />
         ) : (
           <div className="h-64 w-full">
@@ -58,18 +68,19 @@ export function TopProductsChart({ from, to }: Props) {
               <BarChart
                 data={rows}
                 layout="vertical"
-                margin={{ top: 4, right: 64, left: 8, bottom: 4 }}
+                margin={{ top: 4, right: 80, left: 8, bottom: 4 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  className="stroke-border"
+                  stroke="#585657"
+                  strokeOpacity={0.65}
                   horizontal={false}
                 />
                 <XAxis
                   type="number"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 11, fill: "#b9b9b9" }}
                   tickFormatter={(v: number) => formatRupiah(v)}
                 />
                 <YAxis
@@ -77,16 +88,20 @@ export function TopProductsChart({ from, to }: Props) {
                   dataKey="name"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11 }}
-                  width={110}
+                  tick={{ fontSize: 11, fill: "#ffffff" }}
+                  width={115}
                 />
                 <Tooltip
-                  cursor={{ fill: "var(--muted)" }}
+                  cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
                   contentStyle={{
-                    borderRadius: 8,
+                    borderRadius: 5,
                     fontSize: 12,
-                    borderColor: "var(--border)",
+                    backgroundColor: "#242226",
+                    borderColor: "#8e8e8e",
+                    color: "#ffffff",
                   }}
+                  labelStyle={{ color: "#b9b9b9", marginBottom: 4 }}
+                  itemStyle={{ color: "#8ef5b5" }}
                   formatter={(value, name) =>
                     name === "revenue"
                       ? [formatRupiah(Number(value)), "Pendapatan"]
@@ -95,15 +110,21 @@ export function TopProductsChart({ from, to }: Props) {
                 />
                 <Bar
                   dataKey="revenue"
-                  fill="var(--chart-1)"
                   radius={[0, 4, 4, 0]}
                   maxBarSize={22}
+                  isAnimationActive={false}
                 >
+                  {rows.map((_, idx) => (
+                    <Cell
+                      key={idx}
+                      fill={idx === 0 ? "#8ef5b5" : idx === 1 ? "#58c996" : "#24574d"}
+                    />
+                  ))}
                   <LabelList
                     dataKey="revenue"
                     position="right"
                     formatter={(v) => formatRupiah(Number(v))}
-                    style={{ fontSize: 11 }}
+                    style={{ fontSize: 11, fill: "#b9b9b9" }}
                   />
                 </Bar>
               </BarChart>

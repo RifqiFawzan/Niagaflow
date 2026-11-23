@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { Loader2, LockKeyhole } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth, ApiRequestError } from "./AuthContext";
 
 import { Button } from "@/components/ui/button";
@@ -54,16 +54,32 @@ export function LoginPage() {
   };
 
   return (
-    <main className="bg-muted/40 flex min-h-screen items-center justify-center p-4">
+    <main
+      className="bg-background text-foreground flex min-h-screen items-center justify-center p-4"
+      style={{
+        backgroundImage:
+          "linear-gradient(170deg, rgba(36, 87, 77, 0.28) 0%, rgba(21, 19, 22, 0) 45%)",
+      }}
+    >
       <Card className="w-full max-w-sm">
-        <CardHeader>
-          <div className="bg-primary text-primary-foreground mb-2 flex size-10 items-center justify-center rounded-lg">
-            <LockKeyhole className="size-5" />
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className="bg-primary inline-block size-3 rounded-[3px]"
+            />
+            <span className="font-mono text-xs font-medium tracking-[0.03em] text-primary uppercase">
+              NiagaFlow
+            </span>
           </div>
-          <CardTitle className="text-xl">Masuk ke NiagaFlow</CardTitle>
-          <CardDescription>
-            Kelola pesanan, stok, dan laporan usahamu.
-          </CardDescription>
+          <div>
+            <CardTitle as="h1" className="text-2xl font-medium tracking-[-0.03em]">
+              Masuk ke akun
+            </CardTitle>
+            <CardDescription className="mt-1">
+              Kelola pesanan, stok, dan laporan usahamu.
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -89,28 +105,28 @@ export function LoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Masukkan password"
               />
             </div>
 
             {error && (
               <p
                 role="alert"
-                className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm"
+                className="border-destructive-text/40 bg-destructive/15 text-destructive-text rounded-[5px] border px-3 py-2 text-sm"
               >
                 {error}
               </p>
             )}
 
             <Button type="submit" className="w-full" disabled={busy}>
-              {busy && <Loader2 className="animate-spin" />}
+              {busy && <Loader2 aria-hidden="true" className="animate-spin" />}
               {busy ? "Memproses..." : "Masuk"}
             </Button>
           </form>
 
-          <div className="mt-6 space-y-2">
-            <p className="text-muted-foreground text-center text-xs">
-              Akun demo — klik untuk mengisi otomatis
+          <div className="border-border mt-6 space-y-2.5 border-t pt-5">
+            <p className="text-muted-foreground text-center font-mono text-xs uppercase tracking-[0.02em]">
+              Akun demo: klik untuk mengisi
             </p>
             <div className="grid grid-cols-2 gap-2">
               <Button

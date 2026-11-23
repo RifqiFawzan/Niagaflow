@@ -9,6 +9,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -119,14 +120,9 @@ export function CategoriesPage() {
 
       <Card className="max-w-xl py-4">
         <CardContent className="px-4">
-          <form onSubmit={handleCreate} className="flex items-end gap-2">
+          <form onSubmit={handleCreate} className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-1.5">
-              <label
-                htmlFor="new-category"
-                className="text-sm leading-none font-medium"
-              >
-                Kategori baru
-              </label>
+              <Label htmlFor="new-category">Kategori baru</Label>
               <Input
                 id="new-category"
                 value={newName}
@@ -231,6 +227,7 @@ export function CategoriesPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="text-destructive-text hover:bg-destructive/15 hover:text-destructive-text"
                               onClick={() => setTarget(category)}
                             >
                               Hapus

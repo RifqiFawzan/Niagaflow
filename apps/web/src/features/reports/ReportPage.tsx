@@ -131,17 +131,22 @@ export function ReportPage() {
         />
       ) : summary.isSuccess ? (
         <>
-          <Card>
+          <Card
+            style={{
+              background:
+                "linear-gradient(170deg, rgba(36, 87, 77, 0.42) 0%, rgba(30, 28, 32, 0.96) 100%)",
+            }}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-muted-foreground text-sm font-medium">
+              <CardTitle className="font-mono text-xs font-medium tracking-[0.02em] text-primary uppercase">
                 Total penjualan selesai
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold tabular-nums">
+              <p className="text-3xl font-medium tracking-[-0.03em] tabular-nums">
                 {formatRupiah(summary.data.totalSalesCompleted)}
               </p>
-              <p className="text-muted-foreground mt-1 text-xs">
+              <p className="text-muted-foreground mt-1.5 font-mono text-xs">
                 {formatDate(summary.data.from)} – {formatDate(summary.data.to)}
               </p>
             </CardContent>
@@ -239,7 +244,7 @@ export function ReportPage() {
           {lowStock.isPending ? (
             <p className="text-muted-foreground px-6 py-6 text-sm">Memuat...</p>
           ) : lowStock.isError ? (
-            <p className="text-destructive px-6 py-6 text-sm">
+            <p className="text-destructive-text px-6 py-6 text-sm">
               {errorMessage(lowStock.error, "Gagal memuat stok menipis.")}
             </p>
           ) : (lowStock.data ?? []).length === 0 ? (
@@ -264,7 +269,7 @@ export function ReportPage() {
                         {p.sku}
                       </p>
                     </TableCell>
-                    <TableCell className="text-destructive text-right font-medium tabular-nums">
+                    <TableCell className="text-destructive-text text-right font-medium tabular-nums">
                       {p.stock}
                     </TableCell>
                     <TableCell className="pr-4 text-right tabular-nums">

@@ -174,9 +174,9 @@ export function OrderListPage() {
               : "Pesanan yang dibuat akan muncul di sini."
           }
           action={
-            <Button asChild size="sm">
+            <Button asChild variant="outline" size="sm">
               <Link to="/orders/new">
-                <Plus />
+                <Plus aria-hidden="true" />
                 Pesanan baru
               </Link>
             </Button>

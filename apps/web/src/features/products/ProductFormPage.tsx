@@ -232,7 +232,7 @@ export function ProductFormPage() {
             {topError && (
               <p
                 role="alert"
-                className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm"
+                className="border-destructive-text/40 bg-destructive/15 text-destructive-text rounded-[5px] border px-3 py-2 text-sm"
               >
                 {topError}
               </p>
@@ -249,7 +249,7 @@ export function ProductFormPage() {
                   placeholder="Contoh: Makanan Kucing 1kg"
                 />
                 {errors.name && (
-                  <p className="text-destructive text-xs">{errors.name}</p>
+                  <p className="text-destructive-text text-xs">{errors.name}</p>
                 )}
               </div>
 
@@ -264,10 +264,10 @@ export function ProductFormPage() {
                   className="uppercase"
                 />
                 {errors.sku && (
-                  <p className="text-destructive text-xs">{errors.sku}</p>
+                  <p className="text-destructive-text text-xs">{errors.sku}</p>
                 )}
                 {!errors.sku && skuTaken && (
-                  <p className="text-destructive text-xs">
+                  <p className="text-destructive-text text-xs">
                     SKU ini sudah dipakai produk lain.
                   </p>
                 )}
@@ -280,7 +280,7 @@ export function ProductFormPage() {
                 value={form.categoryId}
                 onValueChange={(v) => set("categoryId", v)}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full" aria-label="Kategori">
                   <SelectValue placeholder="Tanpa kategori" />
                 </SelectTrigger>
                 <SelectContent>
@@ -305,7 +305,7 @@ export function ProductFormPage() {
                   aria-invalid={Boolean(errors.price)}
                 />
                 {errors.price && (
-                  <p className="text-destructive text-xs">{errors.price}</p>
+                  <p className="text-destructive-text text-xs">{errors.price}</p>
                 )}
               </div>
 
@@ -319,7 +319,7 @@ export function ProductFormPage() {
                   aria-invalid={Boolean(errors.stock)}
                 />
                 {errors.stock && (
-                  <p className="text-destructive text-xs">{errors.stock}</p>
+                  <p className="text-destructive-text text-xs">{errors.stock}</p>
                 )}
               </div>
 
@@ -333,7 +333,7 @@ export function ProductFormPage() {
                   aria-invalid={Boolean(errors.lowStockThreshold)}
                 />
                 {errors.lowStockThreshold && (
-                  <p className="text-destructive text-xs">
+                  <p className="text-destructive-text text-xs">
                     {errors.lowStockThreshold}
                   </p>
                 )}

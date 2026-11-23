@@ -78,23 +78,36 @@ export function StockMovementListPage() {
   const movementBadge = (type: StockMovement["type"]) => {
     if (type === "MASUK")
       return (
-        <Badge className="border-transparent bg-emerald-100 text-emerald-700">
+        <Badge
+          variant="outline"
+          className="border-primary/45 bg-primary/12 text-primary rounded-full font-mono"
+        >
           Masuk
         </Badge>
       );
     if (type === "KELUAR")
       return (
-        <Badge className="border-transparent bg-red-100 text-red-700">
+        <Badge
+          variant="outline"
+          className="border-destructive-text/40 bg-destructive/15 text-destructive-text rounded-full font-mono"
+        >
           Keluar
         </Badge>
       );
     if (type === "PEMBATALAN")
       return (
-        <Badge className="border-transparent bg-sky-100 text-sky-700">
+        <Badge
+          variant="outline"
+          className="border-info-text/40 bg-[#a8caff]/10 text-info-text rounded-full font-mono"
+        >
           Pembatalan
         </Badge>
       );
-    return <Badge variant="secondary">{STOCK_MOVEMENT_LABELS[type]}</Badge>;
+    return (
+      <Badge variant="secondary" className="rounded-full font-mono">
+        {STOCK_MOVEMENT_LABELS[type]}
+      </Badge>
+    );
   };
 
   return (
@@ -182,8 +195,8 @@ export function StockMovementListPage() {
                       <TableCell>{movementBadge(m.type)}</TableCell>
                       <TableCell
                         className={cn(
-                          "text-right font-semibold tabular-nums",
-                          m.delta >= 0 ? "text-emerald-600" : "text-red-600",
+                          "text-right font-mono font-medium tabular-nums",
+                          m.delta >= 0 ? "text-primary" : "text-destructive-text",
                         )}
                       >
                         {m.delta >= 0 ? `+${m.delta}` : m.delta}

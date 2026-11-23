@@ -100,7 +100,7 @@ export function StockAdjustDialog({
           <DialogTitle>Atur stok</DialogTitle>
           <DialogDescription>
             {product
-              ? `${product.name} — stok saat ini ${product.stock}.`
+              ? `${product.name}: stok saat ini ${product.stock}.`
               : "Catat pergerakan stok produk."}
           </DialogDescription>
         </DialogHeader>
@@ -142,7 +142,11 @@ export function StockAdjustDialog({
               onChange={(event) => setReason(event.target.value)}
             />
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {error ? (
+            <p role="alert" className="text-destructive-text text-sm">
+              {error}
+            </p>
+          ) : null}
           <DialogFooter>
             <Button
               type="button"

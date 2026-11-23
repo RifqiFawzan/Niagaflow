@@ -173,7 +173,7 @@ export function OrderDetailPage() {
                     −{formatRupiah(data.discount)}
                   </dd>
                 </div>
-                <div className="flex justify-between border-t pt-2 text-base font-semibold">
+                <div className="flex justify-between border-t pt-2 text-base font-medium">
                   <dt>Total</dt>
                   <dd className="tabular-nums">{formatRupiah(data.total)}</dd>
                 </div>
@@ -248,7 +248,7 @@ export function OrderDetailPage() {
                   {actions.includes("cancelled") && (
                     <Button
                       variant="outline"
-                      className="text-destructive w-full"
+                      className="border-destructive-text/40 text-destructive-text hover:bg-destructive/15 hover:text-destructive-text w-full"
                       disabled={setStatus.isPending}
                       onClick={() => applyStatus("cancelled")}
                     >
